@@ -33,12 +33,15 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     const rows = await executeQuery(query, Object.keys(params).length > 0 ? params : undefined);
 
+    const totalRedemptions = rows.reduce((sum: number, row: any) => sum + (Number(row.total_redemptions) || 0), 0);
+
     const categories = rows.map((row: any) => ({
       category: row.category || 'Sin categoría',
       subcategory: row.subcategory || 'Sin subcategoría',
       totalRedemptions: Number(row.total_redemptions) || 0,
       totalPoints: Number(row.total_points) || 0,
       uniqueParticipants: Number(row.unique_participants) || 0,
+      percentageOfTotal: totalRedemptions > 0 ? (Number(row.total_redemptions) / totalRedemptions) * 100 : 0,
     }));
 
     return res.status(200).json({ success: true, data: categories });
