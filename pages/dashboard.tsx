@@ -1,10 +1,11 @@
 import Head from 'next/head';
 import { useState } from 'react';
 import useSWR from 'swr';
-import { Container, Box, CircularProgress, Alert, Typography } from '@mui/material';
+import { Container, Box, CircularProgress, Alert, Typography, Grid } from '@mui/material';
 import Header from '@/components/Header';
 import SchemaTable from '@/components/SchemaTable';
 import PointsChart from '@/components/PointsChart';
+import AchievementChart from '@/components/AchievementChart';
 
 const fetcher = (url: string) => fetch(url).then((r) => r.json());
 
@@ -39,7 +40,7 @@ export default function Dashboard() {
         <Header
           activeTab={activeTab}
           onTabChange={setActiveTab}
-          lastChange="Puntos monthly chart"
+          lastChange="Achievement % chart"
           pages={['Puntos', 'Results', 'Transactions']}
         />
 
@@ -56,7 +57,16 @@ export default function Dashboard() {
             </Alert>
           )}
 
-          {activeTab === 0 && <PointsChart />}
+          {activeTab === 0 && (
+            <Grid container spacing={3}>
+              <Grid item xs={12}>
+                <PointsChart />
+              </Grid>
+              <Grid item xs={12}>
+                <AchievementChart />
+              </Grid>
+            </Grid>
+          )}
 
           {data?.success && data.data && (
             <>
