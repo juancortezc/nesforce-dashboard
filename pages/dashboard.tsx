@@ -8,6 +8,7 @@ import PointsChart from '@/components/PointsChart';
 import AchievementChart from '@/components/AchievementChart';
 import TransactionsPage from '@/components/TransactionsPage';
 import ResultsAnalysisPage from '@/components/ResultsAnalysisPage';
+import Program28Page from '@/components/Program28Page';
 
 const fetcher = (url: string) => fetch(url).then((r) => r.json());
 
@@ -42,8 +43,8 @@ export default function Dashboard() {
         <Header
           activeTab={activeTab}
           onTabChange={setActiveTab}
-          lastChange="New: Análisis tab"
-          pages={['Puntos', 'Transacciones', 'Análisis', 'Results', 'Transactions']}
+          lastChange="New: Programa 28 tab"
+          pages={['Puntos', 'Transacciones', 'Análisis', 'Programa 28', 'Results', 'Transactions']}
         />
 
         <Container maxWidth="xl" sx={{ py: 3 }}>
@@ -74,15 +75,17 @@ export default function Dashboard() {
 
           {activeTab === 2 && <ResultsAnalysisPage />}
 
+          {activeTab === 3 && <Program28Page />}
+
           {data?.success && data.data && (
             <>
-              {activeTab === 3 && (
+              {activeTab === 4 && (
                 <SchemaTable
                   columns={data.data.results}
                   title="Results Schema"
                 />
               )}
-              {activeTab === 4 && (
+              {activeTab === 5 && (
                 <SchemaTable
                   columns={data.data.transactions}
                   title="Transactions Schema"
