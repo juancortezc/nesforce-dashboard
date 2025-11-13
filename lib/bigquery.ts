@@ -75,6 +75,7 @@ export const LOCATION = 'southamerica-east1';
 export const TABLES = {
   RESULTS: `\`${PROJECT_ID}.${DATASET_ID}.nesforce_results\``,
   TRANSACTIONS: `\`${PROJECT_ID}.${DATASET_ID}.nestle_transactions\``,
+  NESTJS_REQUEST: `\`${PROJECT_ID}.${DATASET_ID}.nestjsRequests\``,
   INFORMATION_SCHEMA: `\`${PROJECT_ID}.${DATASET_ID}.INFORMATION_SCHEMA.COLUMNS\``,
 } as const;
 
