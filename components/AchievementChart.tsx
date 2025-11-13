@@ -1,4 +1,4 @@
-import { Paper, Box, Typography, CircularProgress, Chip, Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from '@mui/material';
+import { Paper, Box, Typography, CircularProgress, Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from '@mui/material';
 import {
   LineChart,
   Line,
@@ -6,7 +6,6 @@ import {
   YAxis,
   CartesianGrid,
   Tooltip,
-  Legend,
   ResponsiveContainer,
   ReferenceLine,
 } from 'recharts';
@@ -46,10 +45,6 @@ export default function AchievementChart() {
   }
 
   const chartData = data.data || [];
-  const avgPercentage =
-    chartData.length > 0
-      ? chartData.reduce((sum, item) => sum + item.percentage, 0) / chartData.length
-      : 0;
 
   return (
     <Box>
@@ -90,7 +85,9 @@ export default function AchievementChart() {
             <Tooltip
               formatter={(value: number, name: string) => {
                 if (name === 'percentage') return [`${value.toFixed(1)}%`, 'Cumplimiento'];
-                return [value.toLocaleString(), name === 'target' ? 'Objetivo' : 'Alcanzado'];
+                if (name === 'target') return [value.toLocaleString(), 'Objetivo'];
+                if (name === 'achieved') return [value.toLocaleString(), 'Alcanzado'];
+                return [value.toLocaleString(), name];
               }}
               contentStyle={{
                 backgroundColor: 'white',
@@ -99,9 +96,9 @@ export default function AchievementChart() {
               }}
             />
             <ReferenceLine yAxisId="right" y={60} stroke="#757575" strokeDasharray="5 5" label="Meta 60%" />
-            <Line yAxisId="left" type="monotone" dataKey="target" stroke="#1976d2" strokeWidth={2} name="Objetivo" />
-            <Line yAxisId="left" type="monotone" dataKey="achieved" stroke="#2e7d32" strokeWidth={2} name="Alcanzado" />
-            <Line yAxisId="right" type="monotone" dataKey="percentage" stroke="#212121" strokeWidth={2} name="Cumplimiento %" />
+            <Line yAxisId="left" type="monotone" dataKey="target" stroke="#1976d2" strokeWidth={2} name="target" />
+            <Line yAxisId="left" type="monotone" dataKey="achieved" stroke="#2e7d32" strokeWidth={2} name="achieved" />
+            <Line yAxisId="right" type="monotone" dataKey="percentage" stroke="#ff9800" strokeWidth={2} name="percentage" />
           </LineChart>
         </ResponsiveContainer>
       </Paper>

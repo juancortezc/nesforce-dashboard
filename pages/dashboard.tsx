@@ -40,7 +40,7 @@ export default function Dashboard() {
         <Header
           activeTab={activeTab}
           onTabChange={setActiveTab}
-          lastChange="Fixed: using points column"
+          lastChange="% line orange, tooltip fixed"
           pages={['Puntos', 'Results', 'Transactions']}
         />
 
