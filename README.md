@@ -2,6 +2,11 @@
 
 Dashboard de analítica para Nesforce conectado a BigQuery con datos de `nesforce_results` y `nestle_transactions`.
 
+## 📦 Repositorio
+
+- **GitHub**: [https://github.com/juancortezc/nesforce-dashboard](https://github.com/juancortezc/nesforce-dashboard)
+- **Directorio Local**: `/Users/jac/Apps/nestle/nesforce`
+
 ## 🚀 Stack Técnico
 
 - **Framework**: Next.js 15 con Pages Router
