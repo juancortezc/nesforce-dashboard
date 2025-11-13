@@ -1,26 +1,60 @@
-import { AppBar, Toolbar, Tabs, Tab, Container, Box, Chip } from '@mui/material';
+import { AppBar, Toolbar, Container, Box, Chip, Typography, ToggleButtonGroup, ToggleButton } from '@mui/material';
 
 interface HeaderProps {
   activeTab: number;
   onTabChange: (tab: number) => void;
   lastChange?: string;
+  pages?: string[];
 }
 
-export default function Header({ activeTab, onTabChange, lastChange }: HeaderProps) {
+export default function Header({ activeTab, onTabChange, lastChange, pages = ['Results', 'Transactions'] }: HeaderProps) {
   return (
     <AppBar position="static" color="default" elevation={0}>
       <Container maxWidth="xl">
-        <Toolbar disableGutters sx={{ minHeight: { xs: 56, sm: 64 } }}>
-          <Box sx={{ flexGrow: 1, display: 'flex', alignItems: 'center', gap: 2 }}>
-            <Tabs
+        <Toolbar disableGutters sx={{ minHeight: { xs: 56, sm: 64 }, gap: 3 }}>
+          <Typography
+            variant="h6"
+            component="div"
+            sx={{
+              fontWeight: 700,
+              color: 'text.primary',
+              display: { xs: 'none', md: 'block' },
+            }}
+          >
+            DASHBOARD NESFORCE
+          </Typography>
+
+          <Box sx={{ flexGrow: 1, display: 'flex', justifyContent: 'center' }}>
+            <ToggleButtonGroup
               value={activeTab}
-              onChange={(_, newValue) => onTabChange(newValue)}
-              sx={{ height: { xs: 56, sm: 64 } }}
+              exclusive
+              onChange={(_, newValue) => newValue !== null && onTabChange(newValue)}
+              sx={{
+                '& .MuiToggleButton-root': {
+                  px: 3,
+                  py: 1,
+                  border: 'none',
+                  borderRadius: '20px',
+                  textTransform: 'none',
+                  fontWeight: 500,
+                  '&.Mui-selected': {
+                    bgcolor: 'primary.main',
+                    color: 'white',
+                    '&:hover': {
+                      bgcolor: 'primary.dark',
+                    },
+                  },
+                },
+              }}
             >
-              <Tab label="Results" />
-              <Tab label="Transactions" />
-            </Tabs>
+              {pages.map((page, index) => (
+                <ToggleButton key={page} value={index}>
+                  {page}
+                </ToggleButton>
+              ))}
+            </ToggleButtonGroup>
           </Box>
+
           {lastChange && (
             <Chip
               label={lastChange}

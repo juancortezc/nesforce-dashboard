@@ -1,9 +1,10 @@
 import Head from 'next/head';
 import { useState } from 'react';
 import useSWR from 'swr';
-import { Container, Box, CircularProgress, Alert } from '@mui/material';
+import { Container, Box, CircularProgress, Alert, Typography } from '@mui/material';
 import Header from '@/components/Header';
 import SchemaTable from '@/components/SchemaTable';
+import PointsChart from '@/components/PointsChart';
 
 const fetcher = (url: string) => fetch(url).then((r) => r.json());
 
@@ -38,7 +39,8 @@ export default function Dashboard() {
         <Header
           activeTab={activeTab}
           onTabChange={setActiveTab}
-          lastChange="Notes persist to file"
+          lastChange="Puntos monthly chart"
+          pages={['Puntos', 'Results', 'Transactions']}
         />
 
         <Container maxWidth="xl" sx={{ py: 3 }}>
@@ -54,15 +56,17 @@ export default function Dashboard() {
             </Alert>
           )}
 
+          {activeTab === 0 && <PointsChart />}
+
           {data?.success && data.data && (
             <>
-              {activeTab === 0 && (
+              {activeTab === 1 && (
                 <SchemaTable
                   columns={data.data.results}
                   title="Results Schema"
                 />
               )}
-              {activeTab === 1 && (
+              {activeTab === 2 && (
                 <SchemaTable
                   columns={data.data.transactions}
                   title="Transactions Schema"
