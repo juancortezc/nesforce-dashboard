@@ -35,11 +35,8 @@ export default async function handler(
       SELECT
         result_month as month,
         result_year as year,
-        SUM(CAST(achieved AS FLOAT64)) as total_points
+        SUM(points) as total_points
       FROM ${TABLES.RESULTS}
-      WHERE result_month IS NOT NULL
-        AND result_year IS NOT NULL
-        AND achieved IS NOT NULL
       GROUP BY result_year, result_month
       ORDER BY result_year, result_month
     `;

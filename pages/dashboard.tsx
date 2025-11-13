@@ -40,7 +40,7 @@ export default function Dashboard() {
         <Header
           activeTab={activeTab}
           onTabChange={setActiveTab}
-          lastChange="Data tables under charts"
+          lastChange="Fixed: using points column"
           pages={['Puntos', 'Results', 'Transactions']}
         />
 
