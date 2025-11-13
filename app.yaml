@@ -1,0 +1,16 @@
+# Google App Engine Configuration for Nesforce Dashboard
+runtime: nodejs20
+
+instance_class: F2
+
+automatic_scaling:
+  min_instances: 0
+  max_instances: 10
+  target_cpu_utilization: 0.65
+
+env_variables:
+  NODE_ENV: "production"
+
+# Environment variables con credenciales se deben configurar usando:
+# gcloud app deploy --project=lala4-377416
+# Las credenciales de BigQuery se deben configurar como variables de entorno en Google Cloud Console
