@@ -35,7 +35,11 @@ export default function Dashboard() {
       </Head>
 
       <Box sx={{ minHeight: '100vh', bgcolor: 'background.default' }}>
-        <Header activeTab={activeTab} onTabChange={setActiveTab} />
+        <Header
+          activeTab={activeTab}
+          onTabChange={setActiveTab}
+          lastChange="Schema viewer with MD3"
+        />
 
         <Container maxWidth="xl" sx={{ py: 3 }}>
           {isLoading && (
