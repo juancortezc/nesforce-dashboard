@@ -38,7 +38,7 @@ export default function Dashboard() {
         <Header
           activeTab={activeTab}
           onTabChange={setActiveTab}
-          lastChange="Schema viewer with MD3"
+          lastChange="Notes persist to file"
         />
 
         <Container maxWidth="xl" sx={{ py: 3 }}>
