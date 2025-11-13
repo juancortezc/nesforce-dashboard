@@ -11,7 +11,8 @@ import {
   Box,
   Chip,
 } from '@mui/material';
-import { useState } from 'react';
+import { useState, useEffect, useCallback } from 'react';
+import { debounce } from '@mui/material/utils';
 
 interface SchemaColumn {
   column_name: string;
@@ -25,10 +26,35 @@ interface SchemaTableProps {
 }
 
 export default function SchemaTable({ columns, title }: SchemaTableProps) {
+  const tableKey = title.toLowerCase().replace(/\s+/g, '-');
   const [notes, setNotes] = useState<Record<string, string>>({});
 
+  useEffect(() => {
+    fetch('/api/notes')
+      .then((r) => r.json())
+      .then((data) => {
+        if (data.success && data.data?.[tableKey]) {
+          setNotes(data.data[tableKey]);
+        }
+      })
+      .catch((err) => console.error('Error loading notes:', err));
+  }, [tableKey]);
+
+  const saveNotes = useCallback(
+    debounce((updatedNotes: Record<string, string>) => {
+      fetch('/api/notes', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ tableKey, notes: updatedNotes }),
+      }).catch((err) => console.error('Error saving notes:', err));
+    }, 1000),
+    [tableKey]
+  );
+
   const handleNoteChange = (columnName: string, note: string) => {
-    setNotes((prev) => ({ ...prev, [columnName]: note }));
+    const updated = { ...notes, [columnName]: note };
+    setNotes(updated);
+    saveNotes(updated);
   };
 
   return (
