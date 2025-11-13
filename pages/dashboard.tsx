@@ -40,7 +40,7 @@ export default function Dashboard() {
         <Header
           activeTab={activeTab}
           onTabChange={setActiveTab}
-          lastChange="Achievement % chart"
+          lastChange="Data tables under charts"
           pages={['Puntos', 'Results', 'Transactions']}
         />
 
@@ -59,10 +59,10 @@ export default function Dashboard() {
 
           {activeTab === 0 && (
             <Grid container spacing={3}>
-              <Grid item xs={12}>
+              <Grid item xs={12} md={6}>
                 <PointsChart />
               </Grid>
-              <Grid item xs={12}>
+              <Grid item xs={12} md={6}>
                 <AchievementChart />
               </Grid>
             </Grid>
