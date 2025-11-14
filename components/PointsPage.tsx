@@ -19,7 +19,7 @@ import {
   SelectChangeEvent,
   Container,
 } from '@mui/material';
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell } from 'recharts';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell, LineChart, Line, Legend } from 'recharts';
 import useSWR from 'swr';
 
 const fetcher = (url: string) => fetch(url).then((r) => r.json());
@@ -29,6 +29,22 @@ interface MonthlyPoints {
   year: number;
   monthName: string;
   totalPoints: number;
+}
+
+interface KPIPoints {
+  kpiId: string;
+  kpiName: string;
+  totalPoints: number;
+  participantCount: number;
+  avgPointsPerParticipant: number;
+}
+
+interface MonthlyAchievement {
+  month: number;
+  year: number;
+  monthName: string;
+  avgAchievementRate: number;
+  totalParticipants: number;
 }
 
 interface FilterOptions {
@@ -79,6 +95,18 @@ export default function PointsPage() {
   // Load points data with filters
   const { data, error, isLoading } = useSWR<{ success: boolean; data?: MonthlyPoints[] }>(
     `/api/points-monthly${queryString ? `?${queryString}` : ''}`,
+    fetcher
+  );
+
+  // Load KPI points data
+  const { data: kpiData, isLoading: isLoadingKpi } = useSWR<{ success: boolean; data?: KPIPoints[] }>(
+    `/api/points-by-kpi${queryString ? `?${queryString}` : ''}`,
+    fetcher
+  );
+
+  // Load achievement data
+  const { data: achievementData, isLoading: isLoadingAchievement } = useSWR<{ success: boolean; data?: MonthlyAchievement[] }>(
+    `/api/achievement-by-month${queryString ? `?${queryString}` : ''}`,
     fetcher
   );
 
@@ -304,27 +332,101 @@ export default function PointsPage() {
         </Grid>
       </Grid>
 
-      {/* Fila 2: Tabla y Gráfico (Achievement) - Placeholder por ahora */}
+      {/* Fila 2: Tabla de KPI y Gráfico de Achievement */}
       <Grid container spacing={3}>
         <Grid item xs={12} md={6}>
-          <Paper sx={{ p: 3, height: 400 }}>
+          <Paper sx={{ p: 3, height: 500 }}>
             <Typography variant="h6" sx={{ fontWeight: 600, mb: 2, color: '#212121' }}>
               Detalle por KPI
             </Typography>
-            <Typography variant="body2" color="text.secondary">
-              Próximamente: Tabla con desglose por KPI
-            </Typography>
+            {isLoadingKpi ? (
+              <Box sx={{ display: 'flex', justifyContent: 'center', py: 4 }}>
+                <CircularProgress />
+              </Box>
+            ) : (
+              <TableContainer sx={{ maxHeight: 420 }}>
+                <Table size="small" stickyHeader>
+                  <TableHead>
+                    <TableRow>
+                      <TableCell sx={{ fontWeight: 600, bgcolor: '#f5f5f5' }}>KPI</TableCell>
+                      <TableCell align="right" sx={{ fontWeight: 600, bgcolor: '#f5f5f5' }}>
+                        Puntos
+                      </TableCell>
+                      <TableCell align="right" sx={{ fontWeight: 600, bgcolor: '#f5f5f5' }}>
+                        Participantes
+                      </TableCell>
+                      <TableCell align="right" sx={{ fontWeight: 600, bgcolor: '#f5f5f5' }}>
+                        Promedio
+                      </TableCell>
+                    </TableRow>
+                  </TableHead>
+                  <TableBody>
+                    {kpiData?.data?.map((row) => (
+                      <TableRow key={row.kpiId} hover>
+                        <TableCell sx={{ fontSize: '0.875rem' }}>{row.kpiName}</TableCell>
+                        <TableCell align="right" sx={{ fontWeight: 500 }}>
+                          {row.totalPoints.toLocaleString()}
+                        </TableCell>
+                        <TableCell align="right">{row.participantCount}</TableCell>
+                        <TableCell align="right" sx={{ color: '#6750A4', fontWeight: 500 }}>
+                          {row.avgPointsPerParticipant.toLocaleString()}
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </TableContainer>
+            )}
           </Paper>
         </Grid>
 
         <Grid item xs={12} md={6}>
-          <Paper sx={{ p: 3, height: 400 }}>
+          <Paper sx={{ p: 3, height: 500 }}>
             <Typography variant="h6" sx={{ fontWeight: 600, mb: 2, color: '#212121' }}>
-              Logro Promedio
+              % Logro Promedio por Mes
             </Typography>
-            <Typography variant="body2" color="text.secondary">
-              Próximamente: Gráfico de logro por mes
-            </Typography>
+            {isLoadingAchievement ? (
+              <Box sx={{ display: 'flex', justifyContent: 'center', py: 4 }}>
+                <CircularProgress />
+              </Box>
+            ) : (
+              <ResponsiveContainer width="100%" height={420}>
+                <LineChart data={achievementData?.data || []} margin={{ top: 10, right: 10, left: 10, bottom: 5 }}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="#e0e0e0" />
+                  <XAxis
+                    dataKey="monthName"
+                    tick={{ fontSize: 11, fill: '#757575' }}
+                    tickLine={false}
+                    stroke="#e0e0e0"
+                  />
+                  <YAxis
+                    tick={{ fontSize: 11, fill: '#757575' }}
+                    tickLine={false}
+                    stroke="#e0e0e0"
+                    domain={[0, 100]}
+                    tickFormatter={(value) => `${value}%`}
+                  />
+                  <Tooltip
+                    formatter={(value: number) => [`${value.toFixed(1)}%`, '% Logro']}
+                    contentStyle={{
+                      backgroundColor: 'white',
+                      border: '1px solid #e0e0e0',
+                      borderRadius: 8,
+                    }}
+                  />
+                  <Legend />
+                  <Line
+                    type="monotone"
+                    dataKey="avgAchievementRate"
+                    stroke="#6750A4"
+                    strokeWidth={3}
+                    name="% Logro Promedio"
+                    dot={{ r: 5, fill: '#6750A4' }}
+                    activeDot={{ r: 7 }}
+                  />
+                </LineChart>
+              </ResponsiveContainer>
+            )}
           </Paper>
         </Grid>
       </Grid>
