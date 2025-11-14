@@ -33,12 +33,44 @@ export default async function handler(
   }
 
   try {
-    const { distributor } = req.query;
+    const { distributor, categoria, sapCode, subcategoria, exclude, promo } = req.query;
 
-    let whereClause = `WHERE fecha IS NOT NULL AND LENGTH(fecha) >= 8`;
+    const conditions: string[] = ['fecha IS NOT NULL', 'LENGTH(fecha) >= 8'];
+    const params: any = {};
+
     if (distributor && distributor !== 'all') {
-      whereClause += ` AND cod_distribuidor = @distributor`;
+      conditions.push('cod_distribuidor = @distributor');
+      params.distributor = distributor;
     }
+
+    if (categoria && categoria !== 'all') {
+      conditions.push('categoria = @categoria');
+      params.categoria = categoria;
+    }
+
+    if (sapCode && sapCode !== 'all') {
+      conditions.push('clean_cod_sap = @sapCode');
+      params.sapCode = sapCode;
+    }
+
+    if (subcategoria && subcategoria !== 'all') {
+      conditions.push('sku_subcategoria_name = @subcategoria');
+      params.subcategoria = subcategoria;
+    }
+
+    if (exclude === 'true') {
+      conditions.push('exclude = true');
+    } else if (exclude === 'false') {
+      conditions.push('exclude = false');
+    }
+
+    if (promo === 'true') {
+      conditions.push('is_promo = true');
+    } else if (promo === 'false') {
+      conditions.push('is_promo = false');
+    }
+
+    const whereClause = `WHERE ${conditions.join(' AND ')}`;
 
     const query = `
       SELECT
@@ -54,8 +86,7 @@ export default async function handler(
       ORDER BY year, month
     `;
 
-    const params = distributor && distributor !== 'all' ? { distributor } : undefined;
-    const rows = await executeQuery(query, params);
+    const rows = await executeQuery(query, Object.keys(params).length > 0 ? params : undefined);
 
     const monthlyData: MonthlySales[] = rows.map((row: any) => ({
       month: Number(row.month),

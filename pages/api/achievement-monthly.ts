@@ -44,6 +44,7 @@ export default async function handler(
         AND result_year IS NOT NULL
         AND target IS NOT NULL
         AND achieved IS NOT NULL
+       
       GROUP BY result_year, result_month
       ORDER BY result_year, result_month
     `;

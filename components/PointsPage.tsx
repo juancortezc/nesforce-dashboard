@@ -17,6 +17,7 @@ import {
   MenuItem,
   Button,
   SelectChangeEvent,
+  Container,
 } from '@mui/material';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell } from 'recharts';
 import useSWR from 'swr';
@@ -40,7 +41,7 @@ interface FilterOptions {
 
 const COLORS = ['#1976d2', '#2e7d32', '#757575', '#212121', '#42a5f5', '#4caf50'];
 
-export default function PointsChart() {
+export default function PointsPage() {
   const [filters, setFilters] = useState({
     segment: '',
     group: '',
@@ -89,10 +90,11 @@ export default function PointsChart() {
   };
 
   const handleClearFilters = () => {
+    const vendedor = filterOptions?.data?.positions.find(p => p.toLowerCase().includes('vendedor'));
     setFilters({
       segment: '',
       group: '',
-      position: '',
+      position: vendedor || filterOptions?.data?.positions[0] || '',
       route: '',
       kpi: '',
     });
@@ -100,40 +102,48 @@ export default function PointsChart() {
 
   if (isLoading) {
     return (
-      <Paper sx={{ p: 4, textAlign: 'center' }}>
-        <CircularProgress />
-      </Paper>
+      <Container maxWidth="xl" sx={{ py: 3 }}>
+        <Paper sx={{ p: 4, textAlign: 'center' }}>
+          <CircularProgress />
+        </Paper>
+      </Container>
     );
   }
 
   if (error || !data?.success) {
     return (
-      <Paper sx={{ p: 4 }}>
-        <Typography color="error">Error cargando datos</Typography>
-      </Paper>
+      <Container maxWidth="xl" sx={{ py: 3 }}>
+        <Paper sx={{ p: 4 }}>
+          <Typography color="error">Error cargando datos</Typography>
+        </Paper>
+      </Container>
     );
   }
 
   const chartData = data.data || [];
   const totalPoints = chartData.reduce((sum, item) => sum + item.totalPoints, 0);
-  const hasFilters = Object.values(filters).some((v) => v !== '');
+  const hasFilters = Object.values(filters).some((v, i) => {
+    if (i === 2) return false; // position is required
+    return v !== '';
+  });
 
   return (
-    <Box>
-      {/* Filtros */}
-      <Paper sx={{ p: 3, mb: 2 }}>
-        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
-          <Typography variant="h6" sx={{ fontWeight: 600, color: '#212121' }}>
-            Filtros
-          </Typography>
-          {hasFilters && (
-            <Button size="small" onClick={handleClearFilters} sx={{ textTransform: 'none' }}>
-              Limpiar filtros
-            </Button>
-          )}
-        </Box>
+    <Container maxWidth="xl" sx={{ py: 3 }}>
+      {/* Filtros sticky */}
+      <Box sx={{ position: 'sticky', top: 64, zIndex: 100, backgroundColor: '#fafafa', pb: 3, mb: 3 }}>
+        <Paper sx={{ p: 3 }}>
+          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
+            <Typography variant="h6" sx={{ fontWeight: 600, color: '#212121' }}>
+              Filtros
+            </Typography>
+            {hasFilters && (
+              <Button size="small" onClick={handleClearFilters} sx={{ textTransform: 'none' }}>
+                Limpiar filtros
+              </Button>
+            )}
+          </Box>
 
-        <Grid container spacing={2}>
+          <Grid container spacing={2}>
           <Grid item xs={12} sm={6} md={2.4}>
             <FormControl fullWidth size="small">
               <InputLabel>Segmento</InputLabel>
@@ -219,74 +229,105 @@ export default function PointsChart() {
             </FormControl>
           </Grid>
         </Grid>
-      </Paper>
+        </Paper>
+      </Box>
 
-      {/* Gráfico */}
-      <Paper sx={{ p: 3, height: '100%', mb: 2 }}>
-        <Box sx={{ mb: 3 }}>
-          <Typography variant="h6" sx={{ fontWeight: 600, mb: 1, color: '#212121' }}>
-            Puntos Entregados por Mes
-          </Typography>
-          <Typography variant="body2" color="text.secondary">
-            Total: {totalPoints.toLocaleString()} puntos
-          </Typography>
-        </Box>
+      {/* Fila 1: Gráfico y Tabla */}
+      <Grid container spacing={3} sx={{ mb: 3 }}>
+        <Grid item xs={12} md={6}>
+          <Paper sx={{ p: 3, height: '100%' }}>
+            <Box sx={{ mb: 3 }}>
+              <Typography variant="h6" sx={{ fontWeight: 600, mb: 1, color: '#212121' }}>
+                Puntos Entregados por Mes
+              </Typography>
+              <Typography variant="body2" color="text.secondary">
+                Total: {totalPoints.toLocaleString()} puntos
+              </Typography>
+            </Box>
 
-        <ResponsiveContainer width="100%" height={350}>
-          <BarChart data={chartData} margin={{ top: 10, right: 10, left: 10, bottom: 5 }}>
-            <CartesianGrid strokeDasharray="3 3" stroke="#e0e0e0" />
-            <XAxis
-              dataKey="monthName"
-              tick={{ fontSize: 11, fill: '#757575' }}
-              tickLine={false}
-              stroke="#e0e0e0"
-            />
-            <YAxis
-              tick={{ fontSize: 11, fill: '#757575' }}
-              tickLine={false}
-              stroke="#e0e0e0"
-              tickFormatter={(value) => value.toLocaleString()}
-            />
-            <Tooltip
-              formatter={(value: number) => [value.toLocaleString(), 'Puntos']}
-              contentStyle={{
-                backgroundColor: 'white',
-                border: '1px solid #e0e0e0',
-                borderRadius: 8,
-              }}
-            />
-            <Bar dataKey="totalPoints" radius={[8, 8, 0, 0]}>
-              {chartData.map((entry, index) => (
-                <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-              ))}
-            </Bar>
-          </BarChart>
-        </ResponsiveContainer>
-      </Paper>
+            <ResponsiveContainer width="100%" height={350}>
+              <BarChart data={chartData} margin={{ top: 10, right: 10, left: 10, bottom: 5 }}>
+                <CartesianGrid strokeDasharray="3 3" stroke="#e0e0e0" />
+                <XAxis
+                  dataKey="monthName"
+                  tick={{ fontSize: 11, fill: '#757575' }}
+                  tickLine={false}
+                  stroke="#e0e0e0"
+                />
+                <YAxis
+                  tick={{ fontSize: 11, fill: '#757575' }}
+                  tickLine={false}
+                  stroke="#e0e0e0"
+                  tickFormatter={(value) => value.toLocaleString()}
+                />
+                <Tooltip
+                  formatter={(value: number) => [value.toLocaleString(), 'Puntos']}
+                  contentStyle={{
+                    backgroundColor: 'white',
+                    border: '1px solid #e0e0e0',
+                    borderRadius: 8,
+                  }}
+                />
+                <Bar dataKey="totalPoints" radius={[8, 8, 0, 0]}>
+                  {chartData.map((entry, index) => (
+                    <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                  ))}
+                </Bar>
+              </BarChart>
+            </ResponsiveContainer>
+          </Paper>
+        </Grid>
 
-      {/* Tabla */}
-      <TableContainer component={Paper} sx={{ maxHeight: 300 }}>
-        <Table size="small" stickyHeader>
-          <TableHead>
-            <TableRow>
-              <TableCell sx={{ fontWeight: 600, bgcolor: '#f5f5f5' }}>Mes</TableCell>
-              <TableCell align="right" sx={{ fontWeight: 600, bgcolor: '#f5f5f5' }}>
-                Puntos
-              </TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {chartData.map((row) => (
-              <TableRow key={`${row.year}-${row.month}`} hover>
-                <TableCell>{row.monthName}</TableCell>
-                <TableCell align="right" sx={{ fontWeight: 500 }}>
-                  {row.totalPoints.toLocaleString()}
-                </TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </TableContainer>
-    </Box>
+        <Grid item xs={12} md={6}>
+          <TableContainer component={Paper} sx={{ maxHeight: 500 }}>
+            <Table size="small" stickyHeader>
+              <TableHead>
+                <TableRow>
+                  <TableCell sx={{ fontWeight: 600, bgcolor: '#f5f5f5' }}>Mes</TableCell>
+                  <TableCell align="right" sx={{ fontWeight: 600, bgcolor: '#f5f5f5' }}>
+                    Puntos
+                  </TableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {chartData.map((row) => (
+                  <TableRow key={`${row.year}-${row.month}`} hover>
+                    <TableCell>{row.monthName}</TableCell>
+                    <TableCell align="right" sx={{ fontWeight: 500 }}>
+                      {row.totalPoints.toLocaleString()}
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </TableContainer>
+        </Grid>
+      </Grid>
+
+      {/* Fila 2: Tabla y Gráfico (Achievement) - Placeholder por ahora */}
+      <Grid container spacing={3}>
+        <Grid item xs={12} md={6}>
+          <Paper sx={{ p: 3, height: 400 }}>
+            <Typography variant="h6" sx={{ fontWeight: 600, mb: 2, color: '#212121' }}>
+              Detalle por KPI
+            </Typography>
+            <Typography variant="body2" color="text.secondary">
+              Próximamente: Tabla con desglose por KPI
+            </Typography>
+          </Paper>
+        </Grid>
+
+        <Grid item xs={12} md={6}>
+          <Paper sx={{ p: 3, height: 400 }}>
+            <Typography variant="h6" sx={{ fontWeight: 600, mb: 2, color: '#212121' }}>
+              Logro Promedio
+            </Typography>
+            <Typography variant="body2" color="text.secondary">
+              Próximamente: Gráfico de logro por mes
+            </Typography>
+          </Paper>
+        </Grid>
+      </Grid>
+    </Container>
   );
 }

@@ -15,11 +15,32 @@ interface MonthlySales {
 
 interface MonthlySalesCardProps {
   distributor?: string;
+  categoria?: string;
+  sapCode?: string;
+  subcategoria?: string;
+  exclude?: string;
+  promo?: string;
 }
 
-export default function MonthlySalesCard({ distributor = 'all' }: MonthlySalesCardProps) {
+export default function MonthlySalesCard({
+  distributor = 'all',
+  categoria = 'all',
+  sapCode = 'all',
+  subcategoria = 'all',
+  exclude = 'all',
+  promo = 'all',
+}: MonthlySalesCardProps) {
+  const queryParams = new URLSearchParams({
+    distributor,
+    categoria,
+    sapCode,
+    subcategoria,
+    exclude,
+    promo,
+  });
+
   const { data, error, isLoading } = useSWR<{ success: boolean; data?: MonthlySales[] }>(
-    `/api/transactions-monthly?distributor=${distributor}`,
+    `/api/transactions-monthly?${queryParams.toString()}`,
     fetcher
   );
 

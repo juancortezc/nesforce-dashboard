@@ -28,8 +28,13 @@ export default function Program28SummaryCard({ month = 'all', year = 'all', cate
   if (isLoading) return <Paper sx={{ p: 4, textAlign: 'center' }}><CircularProgress /></Paper>;
   if (error || !data?.success) return <Paper sx={{ p: 4 }}><Typography color="error">Error cargando datos</Typography></Paper>;
 
-  const summary = data.data?.summary || {};
-  const monthly = data.data?.monthly || [];
+  const summary = {
+    totalRedemptions: data.data?.totalRedemptions || 0,
+    totalPoints: data.data?.totalPoints || 0,
+    uniqueParticipants: data.data?.totalParticipants || 0,
+    uniqueAwards: data.data?.totalAwards || 0,
+  };
+  const monthly = data.data?.monthlyData || [];
 
   return (
     <>

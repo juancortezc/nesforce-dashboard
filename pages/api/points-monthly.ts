@@ -31,12 +31,25 @@ export default async function handler(
   }
 
   try {
+    const { segment, group, position, route, kpi } = req.query;
+
+    // Build WHERE conditions
+    const conditions: string[] = [];
+    if (segment) conditions.push(`segment_name = '${segment}'`);
+    if (group) conditions.push(`group_name = '${group}'`);
+    if (position) conditions.push(`position_name = '${position}'`);
+    if (route) conditions.push(`route_code = '${route}'`);
+    if (kpi) conditions.push(`kpi_name = '${kpi}'`);
+
+    const whereClause = conditions.length > 0 ? `WHERE ${conditions.join(' AND ')}` : '';
+
     const query = `
       SELECT
         result_month as month,
         result_year as year,
         SUM(points) as total_points
       FROM ${TABLES.RESULTS}
+      ${whereClause}
       GROUP BY result_year, result_month
       ORDER BY result_year, result_month
     `;

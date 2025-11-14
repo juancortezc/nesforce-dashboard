@@ -5,6 +5,8 @@ interface FilterOptions {
   segments: string[];
   groups: string[];
   positions: string[];
+  routes: string[];
+  kpis: string[];
 }
 
 interface FilterOptionsResponse {
@@ -49,16 +51,36 @@ export default async function handler(
       ORDER BY position_name
     `;
 
-    const [segmentsRows, groupsRows, positionsRows] = await Promise.all([
+    // Get distinct routes
+    const routesQuery = `
+      SELECT DISTINCT route_code
+      FROM ${TABLES.RESULTS}
+      WHERE route_code IS NOT NULL
+      ORDER BY route_code
+    `;
+
+    // Get distinct KPIs
+    const kpisQuery = `
+      SELECT DISTINCT kpi_name
+      FROM ${TABLES.RESULTS}
+      WHERE kpi_name IS NOT NULL
+      ORDER BY kpi_name
+    `;
+
+    const [segmentsRows, groupsRows, positionsRows, routesRows, kpisRows] = await Promise.all([
       executeQuery(segmentsQuery),
       executeQuery(groupsQuery),
       executeQuery(positionsQuery),
+      executeQuery(routesQuery),
+      executeQuery(kpisQuery),
     ]);
 
     const filterOptions: FilterOptions = {
       segments: segmentsRows.map((row: any) => row.segment_name),
       groups: groupsRows.map((row: any) => row.group_name),
       positions: positionsRows.map((row: any) => row.position_name),
+      routes: routesRows.map((row: any) => row.route_code),
+      kpis: kpisRows.map((row: any) => row.kpi_name),
     };
 
     return res.status(200).json({

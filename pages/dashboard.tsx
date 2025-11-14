@@ -4,11 +4,11 @@ import useSWR from 'swr';
 import { Container, Box, CircularProgress, Alert, Typography, Grid } from '@mui/material';
 import Header from '@/components/Header';
 import SchemaTable from '@/components/SchemaTable';
-import PointsChart from '@/components/PointsChart';
-import AchievementChart from '@/components/AchievementChart';
+import PointsPage from '@/components/PointsPage';
 import TransactionsPage from '@/components/TransactionsPage';
 import ResultsAnalysisPage from '@/components/ResultsAnalysisPage';
 import Program28Page from '@/components/Program28Page';
+import ComparativesPage from '@/components/ComparativesPage';
 
 const fetcher = (url: string) => fetch(url).then((r) => r.json());
 
@@ -43,8 +43,8 @@ export default function Dashboard() {
         <Header
           activeTab={activeTab}
           onTabChange={setActiveTab}
-          lastChange="New: Programa 28 tab"
-          pages={['Puntos', 'Transacciones', 'Análisis', 'Programa 28', 'Results', 'Transactions']}
+          lastChange="New: Comparativos tab"
+          pages={['Puntos', 'Transacciones', 'Análisis', 'Solicitudes', 'Comparativos', 'Results', 'Transactions']}
         />
 
         <Container maxWidth="xl" sx={{ py: 3 }}>
@@ -60,16 +60,7 @@ export default function Dashboard() {
             </Alert>
           )}
 
-          {activeTab === 0 && (
-            <Grid container spacing={3}>
-              <Grid item xs={12} md={6}>
-                <PointsChart />
-              </Grid>
-              <Grid item xs={12} md={6}>
-                <AchievementChart />
-              </Grid>
-            </Grid>
-          )}
+          {activeTab === 0 && <PointsPage />}
 
           {activeTab === 1 && <TransactionsPage />}
 
@@ -77,15 +68,17 @@ export default function Dashboard() {
 
           {activeTab === 3 && <Program28Page />}
 
+          {activeTab === 4 && <ComparativesPage />}
+
           {data?.success && data.data && (
             <>
-              {activeTab === 4 && (
+              {activeTab === 5 && (
                 <SchemaTable
                   columns={data.data.results}
                   title="Results Schema"
                 />
               )}
-              {activeTab === 5 && (
+              {activeTab === 6 && (
                 <SchemaTable
                   columns={data.data.transactions}
                   title="Transactions Schema"
