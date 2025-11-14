@@ -5,8 +5,8 @@ import useSWR from 'swr';
 const fetcher = (url: string) => fetch(url).then((r) => r.json());
 const COLORS = ['#1976d2', '#2e7d32', '#ff9800', '#757575', '#42a5f5'];
 
-export default function SegmentComparisonCard({ month = 'all', year = 'all', group = 'all', position = 'all' }: any) {
-  const { data, error, isLoading } = useSWR(`/api/results-by-segment?month=${month}&year=${year}&group=${group}&position=${position}`, fetcher);
+export default function SegmentComparisonCard({ month = 'all', year = 'all', group = 'all', position = 'all', route = 'all', kpi = 'all' }: any) {
+  const { data, error, isLoading } = useSWR(`/api/results-by-segment?month=${month}&year=${year}&group=${group}&position=${position}&route=${route}&kpi=${kpi}`, fetcher);
   if (isLoading) return <Paper sx={{ p: 4, textAlign: 'center' }}><CircularProgress /></Paper>;
   if (error || !data?.success) return <Paper sx={{ p: 4 }}><Typography color="error">Error</Typography></Paper>;
 

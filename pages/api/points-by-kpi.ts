@@ -4,6 +4,9 @@ import { executeQuery, TABLES } from '@/lib/bigquery';
 interface KPIPoints {
   kpiId: string;
   kpiName: string;
+  month: number;
+  year: number;
+  monthName: string;
   totalPoints: number;
   participantCount: number;
   avgPointsPerParticipant: number;
@@ -43,21 +46,28 @@ export default async function handler(
       SELECT
         kpi_id,
         kpi_name,
+        result_month,
+        result_year,
         SUM(points) as total_points,
         COUNT(DISTINCT participant_id) as participant_count,
         SAFE_DIVIDE(SUM(points), COUNT(DISTINCT participant_id)) as avg_points_per_participant
       FROM ${TABLES.RESULTS}
       ${whereClause}
-      GROUP BY kpi_id, kpi_name
-      ORDER BY total_points DESC
-      LIMIT 30
+      GROUP BY kpi_id, kpi_name, result_month, result_year
+      ORDER BY result_year DESC, result_month DESC, total_points DESC
+      LIMIT 50
     `;
 
     const rows = await executeQuery(query);
 
+    const MONTH_NAMES = ['', 'Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'];
+
     const kpiData: KPIPoints[] = rows.map((row: any) => ({
       kpiId: row.kpi_id || '',
       kpiName: row.kpi_name || 'Sin nombre',
+      month: Number(row.result_month) || 0,
+      year: Number(row.result_year) || 0,
+      monthName: `${MONTH_NAMES[Number(row.result_month)] || 'N/A'} ${row.result_year}`,
       totalPoints: Math.round(Number(row.total_points) || 0),
       participantCount: Number(row.participant_count) || 0,
       avgPointsPerParticipant: Math.round(Number(row.avg_points_per_participant) || 0),

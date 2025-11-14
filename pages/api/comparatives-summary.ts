@@ -55,7 +55,7 @@ export default async function handler(
     } = req.query;
 
     // Construir WHERE clause base
-    let whereConditions: string[] = ['participant_id IS NOT NULL'];
+    let whereConditions: string[] = ['participant_id IS NOT NULL', "position_name != 'VACACIONISTA'"];
     const params: any = {};
 
     if (segment && segment !== 'all') {

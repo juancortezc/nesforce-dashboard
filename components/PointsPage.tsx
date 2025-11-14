@@ -34,6 +34,9 @@ interface MonthlyPoints {
 interface KPIPoints {
   kpiId: string;
   kpiName: string;
+  month: number;
+  year: number;
+  monthName: string;
   totalPoints: number;
   participantCount: number;
   avgPointsPerParticipant: number;
@@ -66,9 +69,13 @@ export default function PointsPage() {
     kpi: '',
   });
 
-  // Load filter options
+  // Load filter options - pasar segment para filtrar distribuidores
+  const filterOptionsUrl = filters.segment
+    ? `/api/results-filter-options?segment=${encodeURIComponent(filters.segment)}`
+    : '/api/results-filter-options';
+
   const { data: filterOptions } = useSWR<{ success: boolean; data?: FilterOptions }>(
-    '/api/results-filter-options',
+    filterOptionsUrl,
     fetcher
   );
 
@@ -111,10 +118,21 @@ export default function PointsPage() {
   );
 
   const handleFilterChange = (field: keyof typeof filters) => (event: SelectChangeEvent) => {
-    setFilters((prev) => ({
-      ...prev,
-      [field]: event.target.value,
-    }));
+    const newValue = event.target.value;
+
+    // Si cambia el segmento, resetear el distribuidor
+    if (field === 'segment') {
+      setFilters((prev) => ({
+        ...prev,
+        segment: newValue,
+        group: '', // Resetear distribuidor
+      }));
+    } else {
+      setFilters((prev) => ({
+        ...prev,
+        [field]: newValue,
+      }));
+    }
   };
 
   const handleClearFilters = () => {
@@ -348,6 +366,7 @@ export default function PointsPage() {
                 <Table size="small" stickyHeader>
                   <TableHead>
                     <TableRow>
+                      <TableCell sx={{ fontWeight: 600, bgcolor: '#f5f5f5' }}>Mes</TableCell>
                       <TableCell sx={{ fontWeight: 600, bgcolor: '#f5f5f5' }}>KPI</TableCell>
                       <TableCell align="right" sx={{ fontWeight: 600, bgcolor: '#f5f5f5' }}>
                         Puntos
@@ -356,13 +375,14 @@ export default function PointsPage() {
                         Participantes
                       </TableCell>
                       <TableCell align="right" sx={{ fontWeight: 600, bgcolor: '#f5f5f5' }}>
-                        Promedio
+                        Pts Prom/Participante
                       </TableCell>
                     </TableRow>
                   </TableHead>
                   <TableBody>
-                    {kpiData?.data?.map((row) => (
-                      <TableRow key={row.kpiId} hover>
+                    {kpiData?.data?.map((row, idx) => (
+                      <TableRow key={`${row.kpiId}-${row.month}-${row.year}-${idx}`} hover>
+                        <TableCell sx={{ fontSize: '0.875rem', whiteSpace: 'nowrap' }}>{row.monthName}</TableCell>
                         <TableCell sx={{ fontSize: '0.875rem' }}>{row.kpiName}</TableCell>
                         <TableCell align="right" sx={{ fontWeight: 500 }}>
                           {row.totalPoints.toLocaleString()}

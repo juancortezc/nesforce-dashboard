@@ -27,6 +27,8 @@ export default async function handler(
   }
 
   try {
+    const { segment } = req.query;
+
     // Get distinct segments
     const segmentsQuery = `
       SELECT DISTINCT segment_name
@@ -35,13 +37,18 @@ export default async function handler(
       ORDER BY segment_name
     `;
 
-    // Get distinct groups
-    const groupsQuery = `
+    // Get distinct groups - filtrar por segmento si se proporciona
+    let groupsQuery = `
       SELECT DISTINCT group_name
       FROM ${TABLES.RESULTS}
       WHERE group_name IS NOT NULL
-      ORDER BY group_name
     `;
+
+    if (segment && segment !== '' && segment !== 'all') {
+      groupsQuery += ` AND segment_name = '${segment}'`;
+    }
+
+    groupsQuery += ` ORDER BY group_name`;
 
     // Get distinct positions
     const positionsQuery = `

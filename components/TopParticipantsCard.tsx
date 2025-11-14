@@ -20,6 +20,8 @@ interface TopParticipantsCardProps {
   segment?: string;
   group?: string;
   position?: string;
+  route?: string;
+  kpi?: string;
   limit?: number;
 }
 
@@ -29,10 +31,12 @@ export default function TopParticipantsCard({
   segment = 'all',
   group = 'all',
   position = 'all',
+  route = 'all',
+  kpi = 'all',
   limit = 15
 }: TopParticipantsCardProps) {
   const { data, error, isLoading } = useSWR<{ success: boolean; data?: ParticipantPerformance[] }>(
-    `/api/results-top-participants?month=${month}&year=${year}&segment=${segment}&group=${group}&position=${position}&limit=${limit}`,
+    `/api/results-top-participants?month=${month}&year=${year}&segment=${segment}&group=${group}&position=${position}&route=${route}&kpi=${kpi}&limit=${limit}`,
     fetcher
   );
 

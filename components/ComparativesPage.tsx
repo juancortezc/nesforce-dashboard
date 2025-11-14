@@ -59,11 +59,15 @@ export default function ComparativesPage() {
     mode: 'month-to-month',
   });
 
-  // Load filter options
+  // Load filter options - pasar segment para filtrar distribuidores
+  const filterOptionsUrl = filters.segment && filters.segment !== 'all'
+    ? `/api/results-filter-options?segment=${encodeURIComponent(filters.segment)}`
+    : '/api/results-filter-options';
+
   const { data: filterOptions } = useSWR<{
     success: boolean;
     data?: { segments: string[]; groups: string[]; positions: string[]; routes: string[]; kpis: string[] };
-  }>('/api/results-filter-options', fetcher);
+  }>(filterOptionsUrl, fetcher);
 
   // Set default position to "Vendedor"
   useEffect(() => {
@@ -103,10 +107,21 @@ export default function ComparativesPage() {
   );
 
   const handleFilterChange = (field: keyof typeof filters) => (event: SelectChangeEvent) => {
-    setFilters((prev) => ({
-      ...prev,
-      [field]: event.target.value,
-    }));
+    const newValue = event.target.value;
+
+    // Si cambia el segmento, resetear el distribuidor
+    if (field === 'segment') {
+      setFilters((prev) => ({
+        ...prev,
+        segment: newValue,
+        group: 'all', // Resetear distribuidor
+      }));
+    } else {
+      setFilters((prev) => ({
+        ...prev,
+        [field]: newValue,
+      }));
+    }
   };
 
   const handleClearFilters = () => {

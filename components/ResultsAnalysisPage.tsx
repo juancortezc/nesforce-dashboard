@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Box, Container, FormControl, Select, MenuItem, Typography, Paper, Grid, InputLabel } from '@mui/material';
+import { Box, Container, FormControl, Select, MenuItem, Typography, Paper, Grid, InputLabel, Button } from '@mui/material';
 import useSWR from 'swr';
 import TopParticipantsCard from './TopParticipantsCard';
 import KPIPerformanceCard from './KPIPerformanceCard';
@@ -20,8 +20,13 @@ export default function ResultsAnalysisPage() {
   const [route, setRoute] = useState('all');
   const [kpi, setKpi] = useState('all');
 
+  // Load filter options - pasar segment para filtrar distribuidores
+  const filterOptionsUrl = segment && segment !== 'all'
+    ? `/api/results-filter-options?segment=${encodeURIComponent(segment)}`
+    : '/api/results-filter-options';
+
   const { data: filterOptions } = useSWR<{ success: boolean; data?: { segments: string[]; groups: string[]; positions: string[]; routes: string[]; kpis: string[] } }>(
-    '/api/results-filter-options',
+    filterOptionsUrl,
     fetcher
   );
 
@@ -39,14 +44,34 @@ export default function ResultsAnalysisPage() {
     }
   }, [positions, position]);
 
+  const handleClearFilters = () => {
+    const vendedor = positions.find(p => p.toLowerCase().includes('vendedor'));
+    setMonth('all');
+    setYear('all');
+    setSegment('all');
+    setGroup('all');
+    setPosition(vendedor || positions[0] || '');
+    setRoute('all');
+    setKpi('all');
+  };
+
+  const hasFilters = month !== 'all' || year !== 'all' || segment !== 'all' || group !== 'all' || route !== 'all' || kpi !== 'all';
+
   return (
     <Container maxWidth="xl" sx={{ py: 3 }}>
       {/* Barra de filtros sticky */}
       <Box sx={{ position: 'sticky', top: 64, zIndex: 100, backgroundColor: '#fafafa', pb: 3, mb: 3 }}>
         <Paper sx={{ p: 3 }}>
-          <Typography variant="h6" sx={{ fontWeight: 600, mb: 2, color: '#212121' }}>
-            Filtros
-          </Typography>
+          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
+            <Typography variant="h6" sx={{ fontWeight: 600, color: '#212121' }}>
+              Filtros
+            </Typography>
+            {hasFilters && (
+              <Button size="small" onClick={handleClearFilters} sx={{ textTransform: 'none' }}>
+                Limpiar filtros
+              </Button>
+            )}
+          </Box>
 
           <Grid container spacing={2}>
           <Grid item xs={12} sm={6} md={1.7}>
@@ -91,7 +116,10 @@ export default function ResultsAnalysisPage() {
               <Select
                 value={segment}
                 label="Segmento"
-                onChange={(e) => setSegment(e.target.value)}
+                onChange={(e) => {
+                  setSegment(e.target.value);
+                  setGroup('all'); // Resetear distribuidor cuando cambia segmento
+                }}
                 displayEmpty
               >
                 <MenuItem value="all">Todos</MenuItem>

@@ -58,7 +58,7 @@ export default async function handler(
     } = req.query;
 
     // Construir WHERE clause
-    let whereConditions: string[] = ['participant_id IS NOT NULL'];
+    let whereConditions: string[] = ['participant_id IS NOT NULL', "position_name != 'VACACIONISTA'"];
     const params: any = {};
 
     if (month && month !== 'all') {
