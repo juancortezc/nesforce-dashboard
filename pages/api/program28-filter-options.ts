@@ -5,6 +5,13 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   if (req.method !== 'GET') return res.status(405).json({ success: false, error: 'Method not allowed' });
 
   try {
+    const regionsQuery = `
+      SELECT DISTINCT participant_group_region
+      FROM ${TABLES.NESTJS_REQUESTS}
+      WHERE participant_program_id = 28 AND participant_group_region IS NOT NULL
+      ORDER BY participant_group_region
+    `;
+
     const categoriesQuery = `
       SELECT DISTINCT award_categories
       FROM ${TABLES.NESTJS_REQUESTS}
@@ -19,7 +26,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       ORDER BY participant_segment_name
     `;
 
-    const [categoriesRows, segmentsRows] = await Promise.all([
+    const [regionsRows, categoriesRows, segmentsRows] = await Promise.all([
+      executeQuery(regionsQuery),
       executeQuery(categoriesQuery),
       executeQuery(segmentsQuery),
     ]);
@@ -27,6 +35,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     return res.status(200).json({
       success: true,
       data: {
+        regions: regionsRows.map((row: any) => row.participant_group_region),
         categories: categoriesRows.map((row: any) => row.award_categories),
         segments: segmentsRows.map((row: any) => row.participant_segment_name),
       },

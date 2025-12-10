@@ -18,6 +18,7 @@ interface KPIPerformance {
 interface KPIPerformanceCardProps {
   month?: string;
   year?: string;
+  region?: string;
   segment?: string;
   group?: string;
   position?: string;
@@ -25,9 +26,9 @@ interface KPIPerformanceCardProps {
   kpi?: string;
 }
 
-export default function KPIPerformanceCard({ month = 'all', year = 'all', segment = 'all', group = 'all', position = 'all', route = 'all', kpi = 'all' }: KPIPerformanceCardProps) {
+export default function KPIPerformanceCard({ month = 'all', year = 'all', region = 'all', segment = 'all', group = 'all', position = 'all', route = 'all', kpi = 'all' }: KPIPerformanceCardProps) {
   const { data, error, isLoading } = useSWR<{ success: boolean; data?: KPIPerformance[] }>(
-    `/api/results-by-kpi?month=${month}&year=${year}&segment=${segment}&group=${group}&position=${position}&route=${route}&kpi=${kpi}`,
+    `/api/results-by-kpi?month=${month}&year=${year}&region=${region}&segment=${segment}&group=${group}&position=${position}&route=${route}&kpi=${kpi}`,
     fetcher
   );
 

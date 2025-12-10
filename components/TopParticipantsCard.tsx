@@ -17,6 +17,7 @@ interface ParticipantPerformance {
 interface TopParticipantsCardProps {
   month?: string;
   year?: string;
+  region?: string;
   segment?: string;
   group?: string;
   position?: string;
@@ -28,6 +29,7 @@ interface TopParticipantsCardProps {
 export default function TopParticipantsCard({
   month = 'all',
   year = 'all',
+  region = 'all',
   segment = 'all',
   group = 'all',
   position = 'all',
@@ -36,7 +38,7 @@ export default function TopParticipantsCard({
   limit = 15
 }: TopParticipantsCardProps) {
   const { data, error, isLoading } = useSWR<{ success: boolean; data?: ParticipantPerformance[] }>(
-    `/api/results-top-participants?month=${month}&year=${year}&segment=${segment}&group=${group}&position=${position}&route=${route}&kpi=${kpi}&limit=${limit}`,
+    `/api/results-top-participants?month=${month}&year=${year}&region=${region}&segment=${segment}&group=${group}&position=${position}&route=${route}&kpi=${kpi}&limit=${limit}`,
     fetcher
   );
 

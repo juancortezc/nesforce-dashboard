@@ -34,10 +34,11 @@ export default async function handler(
   }
 
   try {
-    const { month, year, category, segment } = req.query;
+    const { month, year, region, category, segment } = req.query;
 
     let whereClause = 'WHERE participant_program_id = 28 AND LOWER(request_status) != \'cancelado\'';
 
+    if (region && region !== '') whereClause += ` AND participant_group_region = @region`;
     if (month && month !== 'all') whereClause += ` AND EXTRACT(MONTH FROM request_requested_at) = @month`;
     if (year && year !== 'all') whereClause += ` AND EXTRACT(YEAR FROM request_requested_at) = @year`;
     if (category && category !== 'all') whereClause += ` AND award_categories LIKE @category`;
@@ -68,6 +69,7 @@ export default async function handler(
     `;
 
     const params: any = {};
+    if (region && region !== '') params.region = region;
     if (month && month !== 'all') params.month = parseInt(month as string);
     if (year && year !== 'all') params.year = parseInt(year as string);
     if (category && category !== 'all') params.category = `%${category}%`;

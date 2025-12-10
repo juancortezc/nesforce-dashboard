@@ -30,9 +30,13 @@ export default async function handler(
   }
 
   try {
-    const { month, year, group, position } = req.query;
+    const { month, year, region, group, position } = req.query;
 
     let whereClause = 'WHERE segment_name IS NOT NULL';
+
+    if (region && region !== 'all') {
+      whereClause += ` AND group_region = @region`;
+    }
 
     if (month && month !== 'all') {
       whereClause += ` AND result_month = @month`;
@@ -67,6 +71,7 @@ export default async function handler(
     `;
 
     const params: any = {};
+    if (region && region !== 'all') params.region = region;
     if (month && month !== 'all') params.month = parseInt(month as string);
     if (year && year !== 'all') params.year = parseInt(year as string);
     if (group && group !== 'all') params.group = group;

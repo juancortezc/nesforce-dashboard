@@ -14,22 +14,28 @@ const YEARS = ['Todos', '2024', '2025'];
 export default function ResultsAnalysisPage() {
   const [month, setMonth] = useState('all');
   const [year, setYear] = useState('all');
+  const [region, setRegion] = useState('all');
   const [segment, setSegment] = useState('all');
   const [group, setGroup] = useState('all');
   const [position, setPosition] = useState(''); // Iniciar vacío, se setea después
   const [route, setRoute] = useState('all');
   const [kpi, setKpi] = useState('all');
 
-  // Load filter options - pasar segment para filtrar distribuidores
-  const filterOptionsUrl = segment && segment !== 'all'
-    ? `/api/results-filter-options?segment=${encodeURIComponent(segment)}`
-    : '/api/results-filter-options';
+  // Load filter options - pasar region y segment para filtrar en cascada
+  const buildFilterOptionsUrl = () => {
+    const params = new URLSearchParams();
+    if (region && region !== 'all') params.append('region', region);
+    if (segment && segment !== 'all') params.append('segment', segment);
+    const queryString = params.toString();
+    return queryString ? `/api/results-filter-options?${queryString}` : '/api/results-filter-options';
+  };
 
-  const { data: filterOptions } = useSWR<{ success: boolean; data?: { segments: string[]; groups: string[]; positions: string[]; routes: string[]; kpis: string[] } }>(
-    filterOptionsUrl,
+  const { data: filterOptions } = useSWR<{ success: boolean; data?: { regions: string[]; segments: string[]; groups: string[]; positions: string[]; routes: string[]; kpis: string[] } }>(
+    buildFilterOptionsUrl(),
     fetcher
   );
 
+  const regions = filterOptions?.data?.regions || [];
   const segments = filterOptions?.data?.segments || [];
   const groups = filterOptions?.data?.groups || [];
   const positions = filterOptions?.data?.positions || [];
@@ -42,12 +48,14 @@ export default function ResultsAnalysisPage() {
       const vendedor = positions.find(p => p.toLowerCase().includes('vendedor'));
       setPosition(vendedor || positions[0]);
     }
-  }, [positions, position]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [positions]);
 
   const handleClearFilters = () => {
     const vendedor = positions.find(p => p.toLowerCase().includes('vendedor'));
     setMonth('all');
     setYear('all');
+    setRegion('all');
     setSegment('all');
     setGroup('all');
     setPosition(vendedor || positions[0] || '');
@@ -55,7 +63,7 @@ export default function ResultsAnalysisPage() {
     setKpi('all');
   };
 
-  const hasFilters = month !== 'all' || year !== 'all' || segment !== 'all' || group !== 'all' || route !== 'all' || kpi !== 'all';
+  const hasFilters = month !== 'all' || year !== 'all' || region !== 'all' || segment !== 'all' || group !== 'all' || route !== 'all' || kpi !== 'all';
 
   return (
     <Container maxWidth="xl" sx={{ py: 3 }}>
@@ -110,7 +118,29 @@ export default function ResultsAnalysisPage() {
             </FormControl>
           </Grid>
 
-          <Grid item xs={12} sm={6} md={1.7}>
+          <Grid item xs={12} sm={6} md={2}>
+            <FormControl fullWidth size="small">
+              <InputLabel>Región</InputLabel>
+              <Select
+                value={region}
+                label="Región"
+                onChange={(e) => {
+                  setRegion(e.target.value);
+                  setSegment('all'); // Resetear segmento cuando cambia región
+                  setGroup('all'); // Resetear distribuidor cuando cambia región
+                }}
+              >
+                <MenuItem value="all">Todas</MenuItem>
+                {regions.map((r) => (
+                  <MenuItem key={r} value={r}>
+                    {r}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+          </Grid>
+
+          <Grid item xs={12} sm={6} md={2}>
             <FormControl fullWidth size="small">
               <InputLabel>Segmento</InputLabel>
               <Select
@@ -210,6 +240,7 @@ export default function ResultsAnalysisPage() {
           <TopParticipantsCard
             month={month}
             year={year}
+            region={region}
             segment={segment}
             group={group}
             position={position}
@@ -222,6 +253,7 @@ export default function ResultsAnalysisPage() {
           <KPIPerformanceCard
             month={month}
             year={year}
+            region={region}
             segment={segment}
             group={group}
             position={position}
@@ -234,6 +266,7 @@ export default function ResultsAnalysisPage() {
           <SegmentComparisonCard
             month={month}
             year={year}
+            region={region}
             group={group}
             position={position}
             route={route}
@@ -245,6 +278,7 @@ export default function ResultsAnalysisPage() {
           <GroupPerformanceCard
             month={month}
             year={year}
+            region={region}
             segment={segment}
             position={position}
             route={route}

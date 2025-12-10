@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import {
   Paper,
   Box,
@@ -64,16 +64,19 @@ export default function PointsChart() {
         position: vendedor || filterOptions.data!.positions[0]
       }));
     }
-  }, [filterOptions, filters.position]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [filterOptions]);
 
-  // Build query string with filters
-  const queryParams = new URLSearchParams();
-  if (filters.segment) queryParams.append('segment', filters.segment);
-  if (filters.group) queryParams.append('group', filters.group);
-  if (filters.position) queryParams.append('position', filters.position);
-  if (filters.route) queryParams.append('route', filters.route);
-  if (filters.kpi) queryParams.append('kpi', filters.kpi);
-  const queryString = queryParams.toString();
+  // Build query string with filters using useMemo to prevent infinite re-renders
+  const queryString = useMemo(() => {
+    const queryParams = new URLSearchParams();
+    if (filters.segment) queryParams.append('segment', filters.segment);
+    if (filters.group) queryParams.append('group', filters.group);
+    if (filters.position) queryParams.append('position', filters.position);
+    if (filters.route) queryParams.append('route', filters.route);
+    if (filters.kpi) queryParams.append('kpi', filters.kpi);
+    return queryParams.toString();
+  }, [filters.segment, filters.group, filters.position, filters.route, filters.kpi]);
 
   // Load points data with filters
   const { data, error, isLoading } = useSWR<{ success: boolean; data?: MonthlyPoints[] }>(

@@ -50,6 +50,7 @@ export default async function handler(
     const {
       month,
       year,
+      region,
       segment,
       group,
       position,
@@ -60,6 +61,11 @@ export default async function handler(
     // Construir WHERE clause
     let whereConditions: string[] = ['participant_id IS NOT NULL', "position_name != 'VACACIONISTA'"];
     const params: any = {};
+
+    if (region && region !== 'all') {
+      whereConditions.push('group_region = @region');
+      params.region = region;
+    }
 
     if (month && month !== 'all') {
       whereConditions.push('result_month = @month');

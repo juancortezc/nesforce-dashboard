@@ -30,7 +30,7 @@ export default async function handler(
   }
 
   try {
-    const { segment, group, position, route, kpi } = req.query;
+    const { region, segment, group, position, route, kpi } = req.query;
 
     // Build WHERE conditions
     const conditions: string[] = ['kpi_name IS NOT NULL'];

@@ -1,0 +1,65 @@
+# Cloud Build configuration para Nesforce Dashboard
+# Despliega a Cloud Run en us-central1
+
+substitutions:
+  _SERVICE_NAME: nesforce-dashboard
+  _REGION: us-central1
+  _PROJECT_ID: lala4-377416
+
+steps:
+  # Build de la imagen Docker
+  - name: 'gcr.io/cloud-builders/docker'
+    args:
+      - 'build'
+      - '-t'
+      - 'gcr.io/${_PROJECT_ID}/${_SERVICE_NAME}:$COMMIT_SHA'
+      - '-t'
+      - 'gcr.io/${_PROJECT_ID}/${_SERVICE_NAME}:latest'
+      - '.'
+
+  # Push de la imagen a Container Registry
+  - name: 'gcr.io/cloud-builders/docker'
+    args:
+      - 'push'
+      - 'gcr.io/${_PROJECT_ID}/${_SERVICE_NAME}:$COMMIT_SHA'
+
+  - name: 'gcr.io/cloud-builders/docker'
+    args:
+      - 'push'
+      - 'gcr.io/${_PROJECT_ID}/${_SERVICE_NAME}:latest'
+
+  # Deploy a Cloud Run
+  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+    entrypoint: gcloud
+    args:
+      - 'run'
+      - 'deploy'
+      - '${_SERVICE_NAME}'
+      - '--image'
+      - 'gcr.io/${_PROJECT_ID}/${_SERVICE_NAME}:$COMMIT_SHA'
+      - '--region'
+      - '${_REGION}'
+      - '--platform'
+      - 'managed'
+      - '--allow-unauthenticated'
+      - '--memory'
+      - '1Gi'
+      - '--cpu'
+      - '1'
+      - '--timeout'
+      - '60s'
+      - '--concurrency'
+      - '100'
+      - '--min-instances'
+      - '0'
+      - '--max-instances'
+      - '10'
+      - '--set-env-vars'
+      - 'NODE_ENV=production'
+
+images:
+  - 'gcr.io/${_PROJECT_ID}/${_SERVICE_NAME}:$COMMIT_SHA'
+  - 'gcr.io/${_PROJECT_ID}/${_SERVICE_NAME}:latest'
+
+options:
+  logging: CLOUD_LOGGING_ONLY

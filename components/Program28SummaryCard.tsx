@@ -19,9 +19,9 @@ function MetricCard({ title, value, color }: MetricCardProps) {
   );
 }
 
-export default function Program28SummaryCard({ month = 'all', year = 'all', category = 'all', segment = 'all' }: any) {
+export default function Program28SummaryCard({ month = 'all', year = 'all', region = '', category = 'all', segment = 'all' }: any) {
   const { data, error, isLoading } = useSWR(
-    `/api/program28-summary?month=${month}&year=${year}&category=${category}&segment=${segment}`,
+    `/api/program28-summary?month=${month}&year=${year}&region=${region}&category=${category}&segment=${segment}`,
     fetcher
   );
 

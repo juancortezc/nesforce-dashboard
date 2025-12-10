@@ -5,9 +5,9 @@ import useSWR from 'swr';
 const fetcher = (url: string) => fetch(url).then((r) => r.json());
 const COLORS = ['#1976d2', '#2e7d32', '#ff9800', '#757575', '#42a5f5', '#4caf50', '#ffb74d', '#9e9e9e', '#64b5f6', '#81c784'];
 
-export default function TopAwardsCard({ month = 'all', year = 'all', category = 'all', segment = 'all' }: any) {
+export default function TopAwardsCard({ month = 'all', year = 'all', region = '', category = 'all', segment = 'all' }: any) {
   const { data, error, isLoading } = useSWR(
-    `/api/program28-top-awards?month=${month}&year=${year}&category=${category}&segment=${segment}`,
+    `/api/program28-top-awards?month=${month}&year=${year}&region=${region}&category=${category}&segment=${segment}`,
     fetcher
   );
 

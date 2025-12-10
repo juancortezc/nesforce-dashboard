@@ -4,6 +4,8 @@ const nextConfig = {
   typescript: {
     ignoreBuildErrors: true,
   },
+  // Output standalone para Cloud Run (Docker optimizado)
+  output: 'standalone',
 }
 
 module.exports = nextConfig

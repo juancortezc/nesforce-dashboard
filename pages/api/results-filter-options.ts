@@ -2,6 +2,7 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import { executeQuery, TABLES } from '@/lib/bigquery';
 
 interface FilterOptions {
+  regions: string[];
   segments: string[];
   groups: string[];
   positions: string[];
@@ -27,22 +28,39 @@ export default async function handler(
   }
 
   try {
-    const { segment } = req.query;
+    const { region, segment } = req.query;
 
-    // Get distinct segments
-    const segmentsQuery = `
+    // Get distinct regions
+    const regionsQuery = `
+      SELECT DISTINCT group_region
+      FROM ${TABLES.RESULTS}
+      WHERE group_region IS NOT NULL
+      ORDER BY group_region
+    `;
+
+    // Get distinct segments - filtrar por región si se proporciona
+    let segmentsQuery = `
       SELECT DISTINCT segment_name
       FROM ${TABLES.RESULTS}
       WHERE segment_name IS NOT NULL
-      ORDER BY segment_name
     `;
 
-    // Get distinct groups - filtrar por segmento si se proporciona
+    if (region && region !== '' && region !== 'all') {
+      segmentsQuery += ` AND group_region = '${region}'`;
+    }
+
+    segmentsQuery += ` ORDER BY segment_name`;
+
+    // Get distinct groups - filtrar por región y segmento si se proporcionan
     let groupsQuery = `
       SELECT DISTINCT group_name
       FROM ${TABLES.RESULTS}
       WHERE group_name IS NOT NULL
     `;
+
+    if (region && region !== '' && region !== 'all') {
+      groupsQuery += ` AND group_region = '${region}'`;
+    }
 
     if (segment && segment !== '' && segment !== 'all') {
       groupsQuery += ` AND segment_name = '${segment}'`;
@@ -74,7 +92,8 @@ export default async function handler(
       ORDER BY kpi_name
     `;
 
-    const [segmentsRows, groupsRows, positionsRows, routesRows, kpisRows] = await Promise.all([
+    const [regionsRows, segmentsRows, groupsRows, positionsRows, routesRows, kpisRows] = await Promise.all([
+      executeQuery(regionsQuery),
       executeQuery(segmentsQuery),
       executeQuery(groupsQuery),
       executeQuery(positionsQuery),
@@ -83,6 +102,7 @@ export default async function handler(
     ]);
 
     const filterOptions: FilterOptions = {
+      regions: regionsRows.map((row: any) => row.group_region),
       segments: segmentsRows.map((row: any) => row.segment_name),
       groups: groupsRows.map((row: any) => row.group_name),
       positions: positionsRows.map((row: any) => row.position_name),

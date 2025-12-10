@@ -1,12 +1,41 @@
+# Dependencias (se instalan en el build)
 node_modules
 npm-debug.log
+
+# Build output (se genera en el build)
 .next
 out
+
+# Git
 .git
+.gitignore
+
+# Variables de entorno (se configuran en Cloud Run)
 .env
 .env.*
 !.env.example
+.env.yaml
+
+# Sistema
 .DS_Store
 *.log
+Thumbs.db
+
+# Testing
 coverage
 .nyc_output
+
+# IDE
+.vscode
+.idea
+*.swp
+*.swo
+
+# Documentación (no necesaria en producción)
+*.md
+!README.md
+docs/
+
+# Configuración de App Engine (ya no se usa)
+app.yaml
+.gcloudignore

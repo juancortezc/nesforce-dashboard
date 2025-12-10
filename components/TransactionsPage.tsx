@@ -23,6 +23,7 @@ const fetcher = (url: string) => fetch(url).then((r) => r.json());
 const MONTHS = ['Todos', 'Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'];
 
 interface FilterOptions {
+  regions: string[];
   categories: string[];
   sapCodes: string[];
   subcategories: string[];
@@ -31,6 +32,7 @@ interface FilterOptions {
 
 export default function TransactionsPage() {
   const [filters, setFilters] = useState({
+    region: '',
     month: 'all',
     distributor: 'all',
     categoria: 'all',

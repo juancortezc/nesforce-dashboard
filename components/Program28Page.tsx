@@ -13,17 +13,19 @@ const YEARS = ['Todos', '2024', '2025'];
 
 export default function Program28Page() {
   const [filters, setFilters] = useState({
+    region: '',
     month: 'all',
     year: 'all',
     category: 'all',
     segment: 'all',
   });
 
-  const { data: filterOptions } = useSWR<{ success: boolean; data?: { categories: string[]; segments: string[] } }>(
+  const { data: filterOptions } = useSWR<{ success: boolean; data?: { regions: string[]; categories: string[]; segments: string[] } }>(
     '/api/program28-filter-options',
     fetcher
   );
 
+  const regions = filterOptions?.data?.regions || [];
   const categories = filterOptions?.data?.categories || [];
   const segments = filterOptions?.data?.segments || [];
 
@@ -36,6 +38,7 @@ export default function Program28Page() {
 
   const handleClearFilters = () => {
     setFilters({
+      region: '',
       month: 'all',
       year: 'all',
       category: 'all',
@@ -43,7 +46,7 @@ export default function Program28Page() {
     });
   };
 
-  const hasFilters = Object.values(filters).some((v) => v !== 'all');
+  const hasFilters = filters.region !== '' || filters.month !== 'all' || filters.year !== 'all' || filters.category !== 'all' || filters.segment !== 'all';
 
   return (
     <Container maxWidth="xl" sx={{ py: 3 }}>
@@ -101,7 +104,25 @@ export default function Program28Page() {
               </FormControl>
             </Grid>
 
-            <Grid item xs={12} sm={6} md={3}>
+            <Grid item xs={12} sm={6} md={2}>
+            <FormControl fullWidth size="small">
+              <InputLabel>Región</InputLabel>
+              <Select
+                value={filters.region}
+                label="Región"
+                onChange={handleFilterChange('region')}
+              >
+                <MenuItem value="">Todas</MenuItem>
+                {regions.map((r) => (
+                  <MenuItem key={r} value={r}>
+                    {r}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+          </Grid>
+
+          <Grid item xs={12} sm={6} md={2}>
               <FormControl fullWidth size="small">
                 <InputLabel>Segmento</InputLabel>
                 <Select value={filters.segment} label="Segmento" onChange={handleFilterChange('segment')}>
@@ -118,10 +139,10 @@ export default function Program28Page() {
         </Paper>
       </Box>
 
-      <Program28SummaryCard month={filters.month} year={filters.year} category={filters.category} segment={filters.segment} />
-      <TopAwardsCard month={filters.month} year={filters.year} category={filters.category} segment={filters.segment} />
-      <TopParticipantsRedemptionCard month={filters.month} year={filters.year} category={filters.category} segment={filters.segment} />
-      <CategoryAnalysisCard month={filters.month} year={filters.year} category={filters.category} segment={filters.segment} />
+      <Program28SummaryCard month={filters.month} year={filters.year} region={filters.region} category={filters.category} segment={filters.segment} />
+      <TopAwardsCard month={filters.month} year={filters.year} region={filters.region} category={filters.category} segment={filters.segment} />
+      <TopParticipantsRedemptionCard month={filters.month} year={filters.year} region={filters.region} category={filters.category} segment={filters.segment} />
+      <CategoryAnalysisCard month={filters.month} year={filters.year} region={filters.region} category={filters.category} segment={filters.segment} />
     </Container>
   );
 }

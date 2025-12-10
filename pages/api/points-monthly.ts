@@ -31,10 +31,11 @@ export default async function handler(
   }
 
   try {
-    const { segment, group, position, route, kpi } = req.query;
+    const { region, segment, group, position, route, kpi } = req.query;
 
     // Build WHERE conditions
     const conditions: string[] = [];
+    if (region) conditions.push(`group_region = '${region}'`);
     if (segment) conditions.push(`segment_name = '${segment}'`);
     if (group) conditions.push(`group_name = '${group}'`);
     if (position) conditions.push(`position_name = '${position}'`);

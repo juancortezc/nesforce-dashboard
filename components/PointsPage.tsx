@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import {
   Paper,
   Box,
@@ -51,6 +51,7 @@ interface MonthlyAchievement {
 }
 
 interface FilterOptions {
+  regions: string[];
   segments: string[];
   groups: string[];
   positions: string[];
@@ -62,6 +63,7 @@ const COLORS = ['#1976d2', '#2e7d32', '#757575', '#212121', '#42a5f5', '#4caf50'
 
 export default function PointsPage() {
   const [filters, setFilters] = useState({
+    region: '',
     segment: '',
     group: '',
     position: '',
@@ -69,10 +71,13 @@ export default function PointsPage() {
     kpi: '',
   });
 
-  // Load filter options - pasar segment para filtrar distribuidores
-  const filterOptionsUrl = filters.segment
-    ? `/api/results-filter-options?segment=${encodeURIComponent(filters.segment)}`
-    : '/api/results-filter-options';
+  // Load filter options - pasar region y segment para filtrar opciones
+  const filterOptionsUrl = useMemo(() => {
+    const params = new URLSearchParams();
+    if (filters.region) params.append('region', filters.region);
+    if (filters.segment) params.append('segment', filters.segment);
+    return `/api/results-filter-options${params.toString() ? `?${params.toString()}` : ''}`;
+  }, [filters.region, filters.segment]);
 
   const { data: filterOptions } = useSWR<{ success: boolean; data?: FilterOptions }>(
     filterOptionsUrl,
@@ -88,16 +93,20 @@ export default function PointsPage() {
         position: vendedor || filterOptions.data!.positions[0]
       }));
     }
-  }, [filterOptions, filters.position]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [filterOptions]);
 
-  // Build query string with filters
-  const queryParams = new URLSearchParams();
-  if (filters.segment) queryParams.append('segment', filters.segment);
-  if (filters.group) queryParams.append('group', filters.group);
-  if (filters.position) queryParams.append('position', filters.position);
-  if (filters.route) queryParams.append('route', filters.route);
-  if (filters.kpi) queryParams.append('kpi', filters.kpi);
-  const queryString = queryParams.toString();
+  // Build query string with filters using useMemo to prevent infinite re-renders
+  const queryString = useMemo(() => {
+    const queryParams = new URLSearchParams();
+    if (filters.region) queryParams.append('region', filters.region);
+    if (filters.segment) queryParams.append('segment', filters.segment);
+    if (filters.group) queryParams.append('group', filters.group);
+    if (filters.position) queryParams.append('position', filters.position);
+    if (filters.route) queryParams.append('route', filters.route);
+    if (filters.kpi) queryParams.append('kpi', filters.kpi);
+    return queryParams.toString();
+  }, [filters.region, filters.segment, filters.group, filters.position, filters.route, filters.kpi]);
 
   // Load points data with filters
   const { data, error, isLoading } = useSWR<{ success: boolean; data?: MonthlyPoints[] }>(
@@ -120,8 +129,17 @@ export default function PointsPage() {
   const handleFilterChange = (field: keyof typeof filters) => (event: SelectChangeEvent) => {
     const newValue = event.target.value;
 
+    // Si cambia la región, resetear segmento y distribuidor
+    if (field === 'region') {
+      setFilters((prev) => ({
+        ...prev,
+        region: newValue,
+        segment: '', // Resetear segmento
+        group: '', // Resetear distribuidor
+      }));
+    }
     // Si cambia el segmento, resetear el distribuidor
-    if (field === 'segment') {
+    else if (field === 'segment') {
       setFilters((prev) => ({
         ...prev,
         segment: newValue,
@@ -138,6 +156,7 @@ export default function PointsPage() {
   const handleClearFilters = () => {
     const vendedor = filterOptions?.data?.positions.find(p => p.toLowerCase().includes('vendedor'));
     setFilters({
+      region: '',
       segment: '',
       group: '',
       position: vendedor || filterOptions?.data?.positions[0] || '',
@@ -190,7 +209,25 @@ export default function PointsPage() {
           </Box>
 
           <Grid container spacing={2}>
-          <Grid item xs={12} sm={6} md={2.4}>
+          <Grid item xs={12} sm={6} md={2}>
+            <FormControl fullWidth size="small">
+              <InputLabel>Región</InputLabel>
+              <Select
+                value={filters.region}
+                label="Región"
+                onChange={handleFilterChange('region')}
+              >
+                <MenuItem value="">Todas</MenuItem>
+                {filterOptions?.data?.regions.map((region) => (
+                  <MenuItem key={region} value={region}>
+                    {region}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+          </Grid>
+
+          <Grid item xs={12} sm={6} md={2}>
             <FormControl fullWidth size="small">
               <InputLabel>Segmento</InputLabel>
               <Select
@@ -208,7 +245,7 @@ export default function PointsPage() {
             </FormControl>
           </Grid>
 
-          <Grid item xs={12} sm={6} md={2.4}>
+          <Grid item xs={12} sm={6} md={2}>
             <FormControl fullWidth size="small">
               <InputLabel>Distribuidor</InputLabel>
               <Select
@@ -226,7 +263,7 @@ export default function PointsPage() {
             </FormControl>
           </Grid>
 
-          <Grid item xs={12} sm={6} md={2.4}>
+          <Grid item xs={12} sm={6} md={2}>
             <FormControl fullWidth size="small">
               <InputLabel>Cargo</InputLabel>
               <Select
@@ -243,7 +280,7 @@ export default function PointsPage() {
             </FormControl>
           </Grid>
 
-          <Grid item xs={12} sm={6} md={2.4}>
+          <Grid item xs={12} sm={6} md={2}>
             <FormControl fullWidth size="small">
               <InputLabel>Ruta</InputLabel>
               <Select
@@ -261,7 +298,7 @@ export default function PointsPage() {
             </FormControl>
           </Grid>
 
-          <Grid item xs={12} sm={6} md={2.4}>
+          <Grid item xs={12} sm={6} md={2}>
             <FormControl fullWidth size="small">
               <InputLabel>KPI</InputLabel>
               <Select value={filters.kpi} label="KPI" onChange={handleFilterChange('kpi')}>

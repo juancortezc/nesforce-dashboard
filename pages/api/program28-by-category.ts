@@ -5,9 +5,10 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   if (req.method !== 'GET') return res.status(405).json({ success: false, error: 'Method not allowed' });
 
   try {
-    const { month, year, segment } = req.query;
+    const { month, year, region, segment } = req.query;
 
     let whereClause = 'WHERE participant_program_id = 28 AND award_categories IS NOT NULL';
+    if (region && region !== '') whereClause += ` AND participant_group_region = @region`;
     if (month && month !== 'all') whereClause += ` AND EXTRACT(MONTH FROM request_requested_at) = @month`;
     if (year && year !== 'all') whereClause += ` AND EXTRACT(YEAR FROM request_requested_at) = @year`;
     if (segment && segment !== 'all') whereClause += ` AND participant_segment_name = @segment`;
@@ -27,6 +28,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     `;
 
     const params: any = {};
+    if (region && region !== '') params.region = region;
     if (month && month !== 'all') params.month = parseInt(month as string);
     if (year && year !== 'all') params.year = parseInt(year as string);
     if (segment && segment !== 'all') params.segment = segment;

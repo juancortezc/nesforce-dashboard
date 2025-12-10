@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import {
   Box,
   Container,
@@ -49,6 +49,7 @@ const YEARS = ['Todos', '2024', '2025'];
 
 export default function ComparativesPage() {
   const [filters, setFilters] = useState({
+    region: '',
     month: 'all',
     year: 'all',
     segment: 'all',
@@ -60,9 +61,12 @@ export default function ComparativesPage() {
   });
 
   // Load filter options - pasar segment para filtrar distribuidores
-  const filterOptionsUrl = filters.segment && filters.segment !== 'all'
-    ? `/api/results-filter-options?segment=${encodeURIComponent(filters.segment)}`
-    : '/api/results-filter-options';
+  const filterOptionsUrl = useMemo(() => {
+    const params = new URLSearchParams();
+    if (filters.region) params.append('region', filters.region);
+    if (filters.segment) params.append('segment', filters.segment);
+    return `/api/results-filter-options${params.toString() ? `?${params.toString()}` : ''}`;
+  }, [filters.region, filters.segment]);
 
   const { data: filterOptions } = useSWR<{
     success: boolean;
@@ -78,18 +82,17 @@ export default function ComparativesPage() {
         position: vendedor || filterOptions.data!.positions[0],
       }));
     }
-  }, [filterOptions, filters.position]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [filterOptions]);
 
-  // Build query string
-  const buildQueryString = () => {
+  // Build query string using useMemo to prevent infinite re-renders
+  const queryString = useMemo(() => {
     const params = new URLSearchParams();
     Object.entries(filters).forEach(([key, value]) => {
       if (value && value !== 'all') params.append(key, value);
     });
     return params.toString();
-  };
-
-  const queryString = buildQueryString();
+  }, [filters]);
 
   // Load data from APIs
   const { data: summaryData, isLoading: loadingSummary } = useSWR(
@@ -109,6 +112,15 @@ export default function ComparativesPage() {
   const handleFilterChange = (field: keyof typeof filters) => (event: SelectChangeEvent) => {
     const newValue = event.target.value;
 
+    // Si cambia la región, resetear segmento y distribuidor
+    if (field === 'region') {
+      setFilters((prev) => ({
+        ...prev,
+        region: newValue,
+        segment: '', // Resetear segmento
+        group: '', // Resetear distribuidor
+      }));
+    }
     // Si cambia el segmento, resetear el distribuidor
     if (field === 'segment') {
       setFilters((prev) => ({
@@ -195,7 +207,25 @@ export default function ComparativesPage() {
               </FormControl>
             </Grid>
 
-            <Grid item xs={12} sm={6} md={1.5}>
+            <Grid item xs={12} sm={6} md={2}>
+            <FormControl fullWidth size="small">
+              <InputLabel>Región</InputLabel>
+              <Select
+                value={filters.region}
+                label="Región"
+                onChange={handleFilterChange('region')}
+              >
+                <MenuItem value="">Todas</MenuItem>
+                {filterOptions?.data?.regions.map((region) => (
+                  <MenuItem key={region} value={region}>
+                    {region}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+          </Grid>
+
+          <Grid item xs={12} sm={6} md={2}>
               <FormControl fullWidth size="small">
                 <InputLabel>Segmento</InputLabel>
                 <Select value={filters.segment} label="Segmento" onChange={handleFilterChange('segment')}>
