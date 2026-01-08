@@ -6,10 +6,10 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
   try {
     const regionsQuery = `
-      SELECT DISTINCT participant_group_region
+      SELECT DISTINCT participant_group_region_name
       FROM ${TABLES.NESTJS_REQUESTS}
-      WHERE participant_program_id = 28 AND participant_group_region IS NOT NULL AND LOWER(request_status) != 'cancelado'
-      ORDER BY participant_group_region
+      WHERE participant_program_id = 28 AND participant_group_region_name IS NOT NULL AND LOWER(request_status) != 'cancelado'
+      ORDER BY participant_group_region_name
     `;
 
     const categoriesQuery = `
@@ -35,7 +35,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     return res.status(200).json({
       success: true,
       data: {
-        regions: regionsRows.map((row: any) => row.participant_group_region),
+        regions: regionsRows.map((row: any) => row.participant_group_region_name),
         categories: categoriesRows.map((row: any) => row.award_categories),
         segments: segmentsRows.map((row: any) => row.participant_segment_name),
       },

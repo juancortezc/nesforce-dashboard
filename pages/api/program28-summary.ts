@@ -38,7 +38,7 @@ export default async function handler(
 
     let whereClause = 'WHERE participant_program_id = 28 AND LOWER(request_status) != \'cancelado\'';
 
-    if (region && region !== '') whereClause += ` AND participant_group_region = @region`;
+    if (region && region !== '') whereClause += ` AND participant_group_region_name = @region`;
     if (month && month !== 'all') whereClause += ` AND EXTRACT(MONTH FROM request_requested_at) = @month`;
     if (year && year !== 'all') whereClause += ` AND EXTRACT(YEAR FROM request_requested_at) = @year`;
     if (category && category !== 'all') whereClause += ` AND award_categories LIKE @category`;
