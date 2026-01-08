@@ -5,7 +5,6 @@ interface GroupPerformance {
   groupId: number;
   groupName: string;
   groupCode: string;
-  supervisorName: string;
   totalPoints: number;
   totalTarget: number;
   totalAchieved: number;
@@ -60,7 +59,6 @@ export default async function handler(
         group_id,
         group_name,
         group_code,
-        group_supervisor_full_name as supervisor_name,
         SUM(points) as total_points,
         SUM(CAST(target AS FLOAT64)) as total_target,
         SUM(CAST(achieved AS FLOAT64)) as total_achieved,
@@ -68,8 +66,8 @@ export default async function handler(
         COUNT(DISTINCT participant_id) as participant_count
       FROM ${TABLES.RESULTS}
       ${whereClause}
-      GROUP BY group_id, group_name, group_code, supervisor_name
-      ORDER BY total_points DESC
+      GROUP BY group_id, group_name, group_code
+      ORDER BY achievement_rate DESC
       LIMIT 30
     `;
 
@@ -86,7 +84,6 @@ export default async function handler(
       groupId: Number(row.group_id),
       groupName: row.group_name || 'Sin nombre',
       groupCode: row.group_code || '',
-      supervisorName: row.supervisor_name || 'Sin supervisor',
       totalPoints: Math.round(Number(row.total_points) || 0),
       totalTarget: Math.round(Number(row.total_target) || 0),
       totalAchieved: Math.round(Number(row.total_achieved) || 0),

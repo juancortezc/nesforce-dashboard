@@ -4,6 +4,7 @@ import { executeQuery, TABLES } from '@/lib/bigquery';
 interface ParticipantPerformance {
   participantId: number;
   participantName: string;
+  groupName: string;
   totalPoints: number;
   totalTarget: number;
   totalAchieved: number;
@@ -29,7 +30,7 @@ export default async function handler(
   }
 
   try {
-    const { month, year, segment, group, position, limit = '20' } = req.query;
+    const { month, year, region, segment, group, position, limit = '20' } = req.query;
 
     let whereClause = 'WHERE participant_id IS NOT NULL';
 
@@ -39,6 +40,10 @@ export default async function handler(
 
     if (year && year !== 'all') {
       whereClause += ` AND result_year = @year`;
+    }
+
+    if (region && region !== 'all') {
+      whereClause += ` AND group_region = @region`;
     }
 
     if (segment && segment !== 'all') {
@@ -57,6 +62,7 @@ export default async function handler(
       SELECT
         participant_id,
         participant_full_name as participant_name,
+        group_name,
         SUM(points) as total_points,
         SUM(CAST(target AS FLOAT64)) as total_target,
         SUM(CAST(achieved AS FLOAT64)) as total_achieved,
@@ -64,7 +70,7 @@ export default async function handler(
         COUNT(DISTINCT kpi_id) as kpi_count
       FROM ${TABLES.RESULTS}
       ${whereClause}
-      GROUP BY participant_id, participant_name
+      GROUP BY participant_id, participant_name, group_name
       ORDER BY total_points DESC
       LIMIT @limit
     `;
@@ -72,6 +78,7 @@ export default async function handler(
     const params: any = { limit: parseInt(limit as string) };
     if (month && month !== 'all') params.month = parseInt(month as string);
     if (year && year !== 'all') params.year = parseInt(year as string);
+    if (region && region !== 'all') params.region = region;
     if (segment && segment !== 'all') params.segment = segment;
     if (group && group !== 'all') params.group = group;
     if (position && position !== 'all') params.position = position;
@@ -81,6 +88,7 @@ export default async function handler(
     const participantData: ParticipantPerformance[] = rows.map((row: any) => ({
       participantId: Number(row.participant_id),
       participantName: row.participant_name || 'Sin nombre',
+      groupName: row.group_name || 'Sin grupo',
       totalPoints: Math.round(Number(row.total_points) || 0),
       totalTarget: Math.round(Number(row.total_target) || 0),
       totalAchieved: Math.round(Number(row.total_achieved) || 0),

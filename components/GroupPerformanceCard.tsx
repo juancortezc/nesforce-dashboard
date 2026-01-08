@@ -21,9 +21,9 @@ export default function GroupPerformanceCard({ month = 'all', year = 'all', regi
             <BarChart data={chartData.slice(0, 10)} margin={{ top: 10, right: 10, left: 10, bottom: 100 }}>
               <CartesianGrid strokeDasharray="3 3" stroke="#e0e0e0" />
               <XAxis dataKey="groupName" angle={-45} textAnchor="end" height={140} tick={{ fontSize: 9, fill: '#757575' }} tickLine={false} stroke="#e0e0e0" />
-              <YAxis tick={{ fontSize: 11, fill: '#757575' }} tickLine={false} stroke="#e0e0e0" tickFormatter={(v) => `${(v/1000).toFixed(0)}k`} />
-              <Tooltip formatter={(value: number) => [value.toLocaleString(), 'Puntos']} contentStyle={{ backgroundColor: 'white', border: '1px solid #e0e0e0', borderRadius: 8 }} />
-              <Bar dataKey="totalPoints" radius={[8, 8, 0, 0]}>{chartData.slice(0, 10).map((_: any, idx: number) => <Cell key={`cell-${idx}`} fill={COLORS[idx % COLORS.length]} />)}</Bar>
+              <YAxis tick={{ fontSize: 11, fill: '#757575' }} tickLine={false} stroke="#e0e0e0" tickFormatter={(v) => `${v}%`} domain={[0, 100]} />
+              <Tooltip formatter={(value: number) => [`${value.toFixed(1)}%`, '% Cumplimiento']} contentStyle={{ backgroundColor: 'white', border: '1px solid #e0e0e0', borderRadius: 8 }} />
+              <Bar dataKey="achievementRate" radius={[8, 8, 0, 0]}>{chartData.slice(0, 10).map((_: any, idx: number) => <Cell key={`cell-${idx}`} fill={COLORS[idx % COLORS.length]} />)}</Bar>
             </BarChart>
           </ResponsiveContainer>
         </Grid>
@@ -33,18 +33,16 @@ export default function GroupPerformanceCard({ month = 'all', year = 'all', regi
               <TableHead>
                 <TableRow>
                   <TableCell sx={{ fontWeight: 600, bgcolor: '#f5f5f5' }}>Grupo</TableCell>
-                  <TableCell sx={{ fontWeight: 600, bgcolor: '#f5f5f5' }}>Supervisor</TableCell>
-                  <TableCell align="right" sx={{ fontWeight: 600, bgcolor: '#f5f5f5' }}>Puntos</TableCell>
                   <TableCell align="right" sx={{ fontWeight: 600, bgcolor: '#f5f5f5' }}>% Cumpl.</TableCell>
+                  <TableCell align="right" sx={{ fontWeight: 600, bgcolor: '#f5f5f5' }}>Puntos</TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
                 {chartData.map((row: any) => (
                   <TableRow key={row.groupId} hover>
                     <TableCell><Typography variant="body2" sx={{ fontSize: '0.875rem', fontWeight: 500 }}>{row.groupName}</Typography><Typography variant="caption" color="text.secondary">{row.groupCode}</Typography></TableCell>
-                    <TableCell><Typography variant="body2" sx={{ fontSize: '0.875rem' }}>{row.supervisorName}</Typography></TableCell>
-                    <TableCell align="right" sx={{ fontWeight: 500 }}>{row.totalPoints.toLocaleString()}</TableCell>
                     <TableCell align="right" sx={{ fontWeight: 600, color: row.achievementRate >= 60 ? '#2e7d32' : '#ff9800' }}>{row.achievementRate.toFixed(1)}%</TableCell>
+                    <TableCell align="right" sx={{ fontWeight: 500 }}>{row.totalPoints.toLocaleString()}</TableCell>
                   </TableRow>
                 ))}
               </TableBody>

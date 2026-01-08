@@ -8,21 +8,21 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     const regionsQuery = `
       SELECT DISTINCT participant_group_region
       FROM ${TABLES.NESTJS_REQUESTS}
-      WHERE participant_program_id = 28 AND participant_group_region IS NOT NULL
+      WHERE participant_program_id = 28 AND participant_group_region IS NOT NULL AND LOWER(request_status) != 'cancelado'
       ORDER BY participant_group_region
     `;
 
     const categoriesQuery = `
       SELECT DISTINCT award_categories
       FROM ${TABLES.NESTJS_REQUESTS}
-      WHERE participant_program_id = 28 AND award_categories IS NOT NULL
+      WHERE participant_program_id = 28 AND award_categories IS NOT NULL AND LOWER(request_status) != 'cancelado'
       ORDER BY award_categories
     `;
 
     const segmentsQuery = `
       SELECT DISTINCT participant_segment_name
       FROM ${TABLES.NESTJS_REQUESTS}
-      WHERE participant_program_id = 28 AND participant_segment_name IS NOT NULL
+      WHERE participant_program_id = 28 AND participant_segment_name IS NOT NULL AND LOWER(request_status) != 'cancelado'
       ORDER BY participant_segment_name
     `;
 

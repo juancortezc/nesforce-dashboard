@@ -7,6 +7,7 @@ const fetcher = (url: string) => fetch(url).then((r) => r.json());
 interface ParticipantPerformance {
   participantId: number;
   participantName: string;
+  groupName: string;
   totalPoints: number;
   totalTarget: number;
   totalAchieved: number;
@@ -74,6 +75,7 @@ export default function TopParticipantsCard({
                 <TableRow>
                   <TableCell sx={{ fontWeight: 600, bgcolor: '#f5f5f5' }}>#</TableCell>
                   <TableCell sx={{ fontWeight: 600, bgcolor: '#f5f5f5' }}>Participante</TableCell>
+                  <TableCell sx={{ fontWeight: 600, bgcolor: '#f5f5f5' }}>Grupo</TableCell>
                   <TableCell align="right" sx={{ fontWeight: 600, bgcolor: '#f5f5f5' }}>Puntos</TableCell>
                   <TableCell align="right" sx={{ fontWeight: 600, bgcolor: '#f5f5f5' }}>% Cumpl.</TableCell>
                   <TableCell align="right" sx={{ fontWeight: 600, bgcolor: '#f5f5f5' }}>KPIs</TableCell>
@@ -88,6 +90,11 @@ export default function TopParticipantsCard({
                     <TableCell>
                       <Typography variant="body2" sx={{ fontSize: '0.875rem' }}>
                         {row.participantName}
+                      </Typography>
+                    </TableCell>
+                    <TableCell>
+                      <Typography variant="body2" sx={{ fontSize: '0.8rem', color: '#666' }}>
+                        {row.groupName}
                       </Typography>
                     </TableCell>
                     <TableCell align="right" sx={{ fontWeight: 500 }}>
