@@ -48,9 +48,6 @@ COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
 # Copiar archivos de datos necesarios
 COPY --from=builder /app/data ./data
 
-# Copiar archivo de variables de entorno para producción
-COPY --from=builder /app/.env.production ./.env.production
-
 USER nextjs
 
 # Puerto estándar de Cloud Run
