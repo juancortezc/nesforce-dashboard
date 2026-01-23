@@ -64,7 +64,7 @@ export default function TopParticipantsCard({
   return (
     <Paper sx={{ p: 3, mb: 3 }}>
       <Typography variant="h6" sx={{ fontWeight: 600, mb: 3, color: '#212121' }}>
-        Top {limit} Participantes por Puntos
+        Top {limit} Participantes por Cumplimiento
       </Typography>
 
       <Grid container spacing={3}>

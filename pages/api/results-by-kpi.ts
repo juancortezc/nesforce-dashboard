@@ -29,7 +29,7 @@ export default async function handler(
   }
 
   try {
-    const { month, year, segment, group, position } = req.query;
+    const { month, year, region, segment, group, position, route, kpi } = req.query;
 
     let whereClause = 'WHERE kpi_name IS NOT NULL';
 
@@ -39,6 +39,10 @@ export default async function handler(
 
     if (year && year !== 'all') {
       whereClause += ` AND result_year = @year`;
+    }
+
+    if (region && region !== 'all') {
+      whereClause += ` AND region_name = @region`;
     }
 
     if (segment && segment !== 'all') {
@@ -51,6 +55,14 @@ export default async function handler(
 
     if (position && position !== 'all') {
       whereClause += ` AND position_name = @position`;
+    }
+
+    if (route && route !== 'all') {
+      whereClause += ` AND route_name = @route`;
+    }
+
+    if (kpi && kpi !== 'all') {
+      whereClause += ` AND kpi_name = @kpi`;
     }
 
     const query = `
@@ -72,9 +84,12 @@ export default async function handler(
     const params: any = {};
     if (month && month !== 'all') params.month = parseInt(month as string);
     if (year && year !== 'all') params.year = parseInt(year as string);
+    if (region && region !== 'all') params.region = region;
     if (segment && segment !== 'all') params.segment = segment;
     if (group && group !== 'all') params.group = group;
     if (position && position !== 'all') params.position = position;
+    if (route && route !== 'all') params.route = route;
+    if (kpi && kpi !== 'all') params.kpi = kpi;
 
     const rows = await executeQuery(query, Object.keys(params).length > 0 ? params : undefined);
 

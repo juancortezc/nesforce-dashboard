@@ -30,7 +30,7 @@ export default async function handler(
   }
 
   try {
-    const { month, year, region, segment, group, position, limit = '20' } = req.query;
+    const { month, year, region, segment, group, position, route, kpi, limit = '20' } = req.query;
 
     let whereClause = 'WHERE participant_id IS NOT NULL';
 
@@ -58,6 +58,14 @@ export default async function handler(
       whereClause += ` AND position_name = @position`;
     }
 
+    if (route && route !== 'all') {
+      whereClause += ` AND route_name = @route`;
+    }
+
+    if (kpi && kpi !== 'all') {
+      whereClause += ` AND kpi_name = @kpi`;
+    }
+
     const query = `
       SELECT
         participant_id,
@@ -71,7 +79,7 @@ export default async function handler(
       FROM ${TABLES.RESULTS}
       ${whereClause}
       GROUP BY participant_id, participant_name, group_name
-      ORDER BY total_points DESC
+      ORDER BY achievement_rate DESC, total_points DESC
       LIMIT @limit
     `;
 
@@ -82,6 +90,8 @@ export default async function handler(
     if (segment && segment !== 'all') params.segment = segment;
     if (group && group !== 'all') params.group = group;
     if (position && position !== 'all') params.position = position;
+    if (route && route !== 'all') params.route = route;
+    if (kpi && kpi !== 'all') params.kpi = kpi;
 
     const rows = await executeQuery(query, params);
 
