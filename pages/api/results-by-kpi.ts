@@ -42,7 +42,7 @@ export default async function handler(
     }
 
     if (region && region !== 'all') {
-      whereClause += ` AND region_name = @region`;
+      whereClause += ` AND group_region = @region`;
     }
 
     if (segment && segment !== 'all') {
