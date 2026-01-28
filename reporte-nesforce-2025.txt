@@ -1,0 +1,256 @@
+[dotenv@17.2.3] injecting env (2) from .env -- tip: ⚙️  override existing env vars with { override: true }
+╔════════════════════════════════════════════════════════════════╗
+║         REPORTE COMPLETO NESFORCE - AÑO 2025                   ║
+╚════════════════════════════════════════════════════════════════╝
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+1. CUMPLIMIENTO DE OBJETIVOS PROMEDIO POR SEGMENTO
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Segmento         Participantes    Cumplimiento %    Puntos Ganados
+------------------------------------------------------------------
+TSP                        514           107.53%         2,724,650
+ELITE                       83            86.93%           416,300
+DSD                         69            66.04%            96,200
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+2. CUMPLIMIENTO POR SEGMENTO Y KPI
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+
+--- TSP ---
+
+KPI                                       Participantes     Cumpl.%      Puntos
+-------------------------------------------------------------------------------
+Presupuesto                                         514     139.77%     510,600
+AMOR DUO                                            400     213.86%     211,800
+CEREALES 30G Y 90G                                  423     151.67%     186,300
+TABLETA LECHE                                       400     136.32%     174,400
+GUMS                                                495      102.5%     170,100
+TABLETA MANI                                        400     120.39%     155,600
+CAFE                                                508     100.21%     149,700
+GRANOLA                                             394     115.66%     135,800
+ZOOLOGIA MINI                                       393     148.82%     124,000
+Presupuesto Caldos                                  384      94.93%     123,000
+RICAS MINI                                          393     139.28%     123,000
+GALLETAS                                            462     103.97%     108,300
+MAGGI ACHIOTE                                       476      61.76%     104,400
+WAFFER                                              421     104.66%      97,500
+CALDOS                                              427     102.11%      82,000
+PURINA                                              379     111.65%      73,700
+CEREALES                                            394     108.17%      70,300
+SALSAS FRÍAS                                        422      99.96%      57,200
+CHOCOWAFFER FRESA                                   314     256.92%      24,500
+CHOCOWAFFER CHOCOLATE                               368     167.86%      23,900
+KIT KAT                                             371      120.7%      18,000
+MAYONESA SANDUCHERA                                   1      125.7%         300
+SAZÓN LIMÓN                                           2     100.56%         250
+TERRAFERTIL                                           1      79.39%           0
+SNACK NH                                              2       31.1%           0
+Presupuesto Amor                                    368          0%           0
+NUTRICION                                             1      67.47%           0
+Sin nombre                                          381       0.29%           0
+
+--- ELITE ---
+
+KPI                                       Participantes     Cumpl.%      Puntos
+-------------------------------------------------------------------------------
+Presupuesto                                          82      95.89%     191,000
+CAFE                                                 82      99.76%      43,500
+Presupuesto Caldos                                   72      98.97%      29,000
+CALDOS                                               81      94.04%      17,300
+GRANOLA                                              74      79.67%      14,800
+CEREALES 30G Y 90G                                   75     112.85%      14,200
+GALLETAS                                             35      101.3%      12,400
+PURINA                                               73     121.31%      11,700
+GUMS                                                 74     123.53%      10,400
+SALSAS FRÍAS                                         75      96.44%       9,700
+MAGGI ACHIOTE                                        82      61.72%       7,600
+CEREALES                                             74      95.13%       7,500
+MAYONESA SANDUCHERA                                  44     105.26%       7,200
+SAZÓN LIMÓN                                          74     101.15%       6,100
+NESTLE TABLETA MANI                                  33     113.68%       5,500
+NESTLE TABLETA LECHE                                 33     113.43%       5,400
+AMOR DUO                                             33     106.28%       5,300
+ZOOLOGIA MINI                                        30     105.54%       4,700
+WAFFER                                               33      91.82%       4,400
+RICAS MINI                                           30     103.72%       3,800
+NUTRICION                                            21      74.31%       2,000
+NESTLE Tableta Leche                                 32      80.25%       1,400
+SNACK NH                                             69      38.29%         900
+TERRAFERTIL                                          20      84.95%         400
+NESTLE Tableta Mani                                  32      62.44%         100
+CHOCOFANTÁSTICOS                                     30      34.16%           0
+Presupuesto Amor                                     32          0%           0
+Sin nombre                                           68      41.37%           0
+
+--- DSD ---
+
+KPI                                       Participantes     Cumpl.%      Puntos
+-------------------------------------------------------------------------------
+Presupuesto                                          67      90.58%      44,700
+WAFFER                                               66      91.28%      20,100
+GALLETAS                                             59     100.85%      10,700
+CHOCOLATE                                            69       80.7%       9,700
+RICAS Y ZOOLOGIA MINI                                57      66.94%       5,800
+AMOR DUO                                             66      52.71%       3,000
+CHOCOTRIO                                            66      30.13%       1,400
+NESTLE Chocobiscuit Leche 4(12x90g) BR               57      35.07%         400
+NESTLE Chocobiscuit PB 4(12x90g) BR                  57      30.22%         200
+TABLETAS IMPULSO                                     57      14.91%         200
+NESTLE Tableta Mani 9(21x20g) EC                     57      22.15%           0
+KIT KAT                                              57      19.75%           0
+MAGGI ACHIOTE                                         1      44.68%           0
+SAZÓN LIMÓN                                           1         92%           0
+MINI MARIA Y VAINILLA                                65          0%           0
+NESTLE Tableta Leche 9(21x19g) EC                    57      28.67%           0
+SALSAS FRÍAS                                          1      75.83%           0
+SNACK NH                                              1       9.09%           0
+CALDOS                                                1      48.72%           0
+CAFE                                                  1      76.88%           0
+NUTRICION                                             1      48.25%           0
+CEREALES 30G Y 90G                                    1      65.71%           0
+Sin nombre                                            1      33.66%           0
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+3. VENDEDORES PARTICIPANTES POR SEGMENTO
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+a) Vendedores que GANARON PUNTOS:
+
+Segmento         Vendedores   Total Puntos
+------------------------------------------
+TSP                     501      2,724,650
+ELITE                    79        416,300
+DSD                      59         96,200
+
+
+b) Vendedores que CANJEARON PREMIOS:
+
+Segmento         Vendedores    Canjes  Puntos Canjeados
+-------------------------------------------------------
+TSP                     383      2813         1,900,486
+ELITE                    66       379           238,885
+DSD                      45       154            47,783
+Sin segmento              1         1               112
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+4. CATEGORÍAS DE PREMIOS MÁS CANJEADOS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Categoría                    Canjes      Puntos     Costo USD
+-------------------------------------------------------------
+Hogar                          1146     868,188    $44,056.17
+Cupones                        1142     173,522     $9,111.01
+Tecnología                      403     452,159    $21,873.98
+Celulares                       168     348,442    $17,534.06
+Juguetes                        123      27,503     $1,382.78
+Deportes                        116      61,273     $2,999.15
+Mejora tu Negocio                99      76,550     $3,824.42
+Perfumería y Cuidado Per         25      22,025     $1,350.08
+Navidad, Hogar                   22      10,382          $602
+Computadoras                     18      65,159     $3,540.19
+Hogar, Mejora tu Negocio         15      13,089          $669
+Mejora tu Negocio, Hogar         15       6,320        $353.7
+Bebé                             13       9,024       $442.86
+Autos & Motos, Tecnologí         10       4,110          $200
+Autos & Motos                     7       3,097          $183
+Celulares, Tecnología             6      13,330       $705.24
+Tecnología, Celulares             5      12,425          $605
+Mascotas                          4       2,010           $97
+Estilo de vida                    3       4,240          $212
+Hogar, Navidad                    2       1,639        $79.85
+Hobbies                           1       7,227          $536
+Tecnología, Computadoras          1         657           $32
+Estilo de vida, Cupones           1       2,000          $100
+Juguetes, Bebé                    1       1,129           $55
+Hogar, Tecnología                 1       1,766           $86
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+5. TOP 10 PREMIOS MÁS CANJEADOS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+#   Premio                                       Categoría        Canjes
+------------------------------------------------------------------------
+1.  Celular                                      Celulares           168
+2.  Cupón $5                                     Cupones             139
+3.  Cupón $10                                    Cupones             123
+4.  Cupón $20                                    Cupones             104
+5.  Combo Ruster                                 Cupones              87
+6.  Audífonos                                    Tecnología           82
+7.  Smart Watch                                  Tecnología           59
+8.  Parlante                                     Tecnología           59
+9.  Presa +Arroz + Menestra                      Cupones              58
+10. Licuadora                                    Hogar                58
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+6. TOP 10 PREMIOS DE MÁS ALTO VALOR
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+#   Premio                                      Puntos   Costo USD  Canjes
+--------------------------------------------------------------------------
+1.  Portátil                                     9,497     $560.00       7
+2.  Refrigeradora                                7,607     $550.00       5
+3.  Consola                                      7,227     $536.00       1
+4.  Lavadora                                     5,569     $413.00       6
+5.  Cama                                         5,091     $394.00       1
+6.  Aire Acondicionado                           7,736     $361.00       6
+7.  Celular                                      7,290     $355.00     168
+8.  Smart Tv                                     7,286     $340.00      45
+9.  Parlante                                     6,777     $330.00      59
+10. Colchón                                      5,360     $261.00       7
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+7. TIEMPO PROMEDIO DE ENTREGA DE PREMIOS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Tiempo promedio: 19.4 días
+Tiempo mínimo: -335 días
+Tiempo máximo: 131 días
+Total entregas: 3200
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+8. TOP 10 DISTRIBUIDORAS POR SEGMENTO
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+
+--- TSP ---
+
+#   Distribuidora                             Vendedores   Cumpl.%      Puntos
+------------------------------------------------------------------------------
+1.  DISTRIBUCIONES MUÑOZ VILLAQUIRAN S.A. D           52    97.12%     327,100
+2.  MARVECOBE                                         34   116.35%     261,850
+3.  COMERCIAL H&B CHB S.A.                            49   104.96%     241,500
+4.  CRONOCOSTA S.A.                                   28   106.83%     226,350
+5.  BARNUEVO VALAREZO & GCP CIA LTDA                  31   138.27%     171,400
+6.  SURTIANDINOS QUITO                                16   139.34%     146,500
+7.  ABATACORP CIA. LTDA                               25    100.8%     146,200
+8.  EXECOM EXCELENCIA EN COMERCIO DISTRIBUC           25   109.42%     139,350
+9.  SURTITODO S.A.                                    19   106.26%     131,150
+10. LAURA NARVAEZ                                     18       90%     118,250
+
+--- ELITE ---
+
+#   Distribuidora                             Vendedores   Cumpl.%      Puntos
+------------------------------------------------------------------------------
+1.  LAURA NARVAEZ                                      8     87.9%      56,600
+2.  OLMEDO ARIAS LUIS FELIPE                           8    95.79%      53,850
+3.  BARNUEVO VALAREZO & GCP CIA LTDA                  13    89.82%      51,200
+4.  MARVECOBE                                          7    97.92%      49,200
+5.  SURTIANDINO                                        6    96.49%      45,700
+6.  GRANDA LAICA LUIS SALOMON                          5    94.02%      39,750
+7.  DISTRIBUCIONES MUÑOZ VILLAQUIRAN S.A. D           10    72.67%      35,400
+8.  COMERCIAL H&B CHB S.A.                            11     70.7%      33,050
+9.  EXECOM EXCELENCIA EN COMERCIO DISTRIBUC            8    91.19%      32,550
+10. PALDONI                                            6    76.18%      18,300
+
+--- DSD ---
+
+#   Distribuidora                             Vendedores   Cumpl.%      Puntos
+------------------------------------------------------------------------------
+1.  QUITO                                             37    70.81%      49,750
+2.  GUAYAQUIL                                         32    60.86%      46,450
+
+╔════════════════════════════════════════════════════════════════╗
+║                     FIN DEL REPORTE                            ║
+╚════════════════════════════════════════════════════════════════╝
