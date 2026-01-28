@@ -5,6 +5,7 @@ import TopParticipantsCard from './TopParticipantsCard';
 import KPIPerformanceCard from './KPIPerformanceCard';
 import SegmentComparisonCard from './SegmentComparisonCard';
 import GroupPerformanceCard from './GroupPerformanceCard';
+import SellOutPerformanceCard from './SellOutPerformanceCard';
 
 const fetcher = (url: string) => fetch(url).then((r) => r.json());
 
@@ -283,6 +284,16 @@ export default function ResultsAnalysisPage() {
             position={position}
             route={route}
             kpi={kpi}
+          />
+        </Grid>
+
+        <Grid item xs={12}>
+          <SellOutPerformanceCard
+            month={month}
+            year={year}
+            region={region}
+            segment={segment}
+            position={position}
           />
         </Grid>
       </Grid>
