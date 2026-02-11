@@ -25,7 +25,7 @@ export default async function handler(
   }
 
   try {
-    const { month, year } = req.query;
+    const { month, year, segment, distributor } = req.query;
     const client = getBigQueryClient();
 
     let whereClause = 'WHERE request_dispatched_at IS NOT NULL';
@@ -34,6 +34,12 @@ export default async function handler(
     }
     if (year && year !== 'all') {
       whereClause += ` AND EXTRACT(YEAR FROM request_dispatched_at) = ${parseInt(year as string)}`;
+    }
+    if (segment && segment !== 'all') {
+      whereClause += ` AND segmento = '${segment}'`;
+    }
+    if (distributor && distributor !== 'all') {
+      whereClause += ` AND distribuidora = '${distributor}'`;
     }
 
     // Query para despachos por día (últimos 30 días con datos)
@@ -54,6 +60,8 @@ export default async function handler(
         WHERE request_delivered_at IS NOT NULL
         ${month && month !== 'all' ? `AND EXTRACT(MONTH FROM request_delivered_at) = ${parseInt(month as string)}` : ''}
         ${year && year !== 'all' ? `AND EXTRACT(YEAR FROM request_delivered_at) = ${parseInt(year as string)}` : ''}
+        ${segment && segment !== 'all' ? `AND segmento = '${segment}'` : ''}
+        ${distributor && distributor !== 'all' ? `AND distribuidora = '${distributor}'` : ''}
         GROUP BY delivery_date
       )
       SELECT

@@ -30,7 +30,7 @@ export default async function handler(
   }
 
   try {
-    const { month, year } = req.query;
+    const { month, year, segment, distributor } = req.query;
     const client = getBigQueryClient();
 
     let whereClause = `
@@ -43,6 +43,12 @@ export default async function handler(
     }
     if (year && year !== 'all') {
       whereClause += ` AND EXTRACT(YEAR FROM request_requested_at) = ${parseInt(year as string)}`;
+    }
+    if (segment && segment !== 'all') {
+      whereClause += ` AND segmento = '${segment}'`;
+    }
+    if (distributor && distributor !== 'all') {
+      whereClause += ` AND distribuidora = '${distributor}'`;
     }
 
     const query = `

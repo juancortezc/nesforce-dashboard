@@ -21,6 +21,7 @@ import {
   Chip,
   IconButton,
   Tooltip,
+  TablePagination,
 } from '@mui/material';
 import {
   BarChart,
@@ -42,6 +43,8 @@ import WarehouseIcon from '@mui/icons-material/Warehouse';
 import TimerIcon from '@mui/icons-material/Timer';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import DownloadIcon from '@mui/icons-material/Download';
+import EmojiEventsIcon from '@mui/icons-material/EmojiEvents';
+import WarningIcon from '@mui/icons-material/Warning';
 import { PageHeader } from './PageHeader';
 import { FiltersCard } from './FiltersCard';
 import { KPICards } from './KPICards';
@@ -95,6 +98,26 @@ interface DelayedRequest {
   delayDays: number;
 }
 
+interface DistributorRanking {
+  rank: number;
+  distributor: string;
+  totalRequests: number;
+  delivered: number;
+  pending: number;
+}
+
+interface DelayedRanking {
+  rank: number;
+  distributor: string;
+  delayedRequests: number;
+  avgDelayDays: number;
+}
+
+interface FilterOptions {
+  segments: string[];
+  distributors: string[];
+}
+
 const STATUS_LABELS: Record<string, string> = {
   ORDERRED: 'Solicitado',
   WAREHOUSE: 'En Bodega',
@@ -107,12 +130,24 @@ export default function LogisticsPage({ currentIndex = 5, totalPages = 6, onPrev
   const [filters, setFilters] = useState({
     month: 'all',
     year: CURRENT_YEAR,
+    segment: 'all',
+    distributor: 'all',
   });
+
+  const [rankingPage, setRankingPage] = useState(0);
+  const [delayedRankingPage, setDelayedRankingPage] = useState(0);
+
+  const { data: filterOptions } = useSWR<{ success: boolean; data?: FilterOptions }>(
+    '/api/logistics-filter-options',
+    fetcher
+  );
 
   const queryString = useMemo(() => {
     const params = new URLSearchParams();
     if (filters.month !== 'all') params.append('month', filters.month);
     if (filters.year !== 'all') params.append('year', filters.year);
+    if (filters.segment !== 'all') params.append('segment', filters.segment);
+    if (filters.distributor !== 'all') params.append('distributor', filters.distributor);
     return params.toString();
   }, [filters]);
 
@@ -136,23 +171,59 @@ export default function LogisticsPage({ currentIndex = 5, totalPages = 6, onPrev
     fetcher
   );
 
+  const rankingQueryString = useMemo(() => {
+    const params = new URLSearchParams();
+    if (filters.month !== 'all') params.append('month', filters.month);
+    if (filters.year !== 'all') params.append('year', filters.year);
+    if (filters.segment !== 'all') params.append('segment', filters.segment);
+    if (filters.distributor !== 'all') params.append('distributor', filters.distributor);
+    params.append('page', (rankingPage + 1).toString());
+    params.append('pageSize', '10');
+    return params.toString();
+  }, [filters, rankingPage]);
+
+  const delayedRankingQueryString = useMemo(() => {
+    const params = new URLSearchParams();
+    if (filters.month !== 'all') params.append('month', filters.month);
+    if (filters.year !== 'all') params.append('year', filters.year);
+    if (filters.segment !== 'all') params.append('segment', filters.segment);
+    if (filters.distributor !== 'all') params.append('distributor', filters.distributor);
+    params.append('page', (delayedRankingPage + 1).toString());
+    params.append('pageSize', '10');
+    return params.toString();
+  }, [filters, delayedRankingPage]);
+
+  const { data: distributorRanking, isLoading: loadingRanking } = useSWR<{
+    success: boolean;
+    data?: { items: DistributorRanking[]; total: number; totalPages: number };
+  }>(`/api/logistics-distributor-ranking?${rankingQueryString}`, fetcher);
+
+  const { data: delayedRanking, isLoading: loadingDelayedRanking } = useSWR<{
+    success: boolean;
+    data?: { items: DelayedRanking[]; total: number; totalPages: number };
+  }>(`/api/logistics-delayed-ranking?${delayedRankingQueryString}`, fetcher);
+
   const handleFilterChange = (field: keyof typeof filters) => (event: SelectChangeEvent) => {
     setFilters((prev) => ({
       ...prev,
       [field]: event.target.value,
     }));
+    setRankingPage(0);
+    setDelayedRankingPage(0);
   };
 
   const handleClearFilters = () => {
     setFilters({
       month: 'all',
       year: CURRENT_YEAR,
+      segment: 'all',
+      distributor: 'all',
     });
+    setRankingPage(0);
+    setDelayedRankingPage(0);
   };
 
-  const hasFilters = filters.month !== 'all' || filters.year !== CURRENT_YEAR;
-
-  const formatNumber = (num: number) => num.toLocaleString('es-ES');
+  const hasFilters = filters.month !== 'all' || filters.year !== CURRENT_YEAR || filters.segment !== 'all' || filters.distributor !== 'all';
 
   const pieData = onTimeData?.data ? [
     { name: 'A Tiempo', value: onTimeData.data.onTime, color: '#4CAF50' },
@@ -162,7 +233,7 @@ export default function LogisticsPage({ currentIndex = 5, totalPages = 6, onPrev
   const handleDownloadCSV = () => {
     if (!delayedData?.data?.length) return;
 
-    const headers = ['Código', 'Participante', 'Premio', 'Fecha Solicitado', 'Estado', 'Días de Retraso'];
+    const headers = ['Codigo', 'Participante', 'Premio', 'Fecha Solicitado', 'Estado', 'Dias de Retraso'];
     const rows = delayedData.data.map(r => [
       r.requestCode,
       r.participantName,
@@ -182,10 +253,13 @@ export default function LogisticsPage({ currentIndex = 5, totalPages = 6, onPrev
     URL.revokeObjectURL(url);
   };
 
+  const segments = filterOptions?.data?.segments || [];
+  const distributors = filterOptions?.data?.distributors || [];
+
   return (
     <Box>
       <PageHeader
-        title="Logística"
+        title="Logistica"
         currentIndex={currentIndex}
         totalPages={totalPages}
         onPrevious={onPrevious}
@@ -203,10 +277,30 @@ export default function LogisticsPage({ currentIndex = 5, totalPages = 6, onPrev
         </FormControl>
 
         <FormControl size="small" sx={{ minWidth: 80 }}>
-          <InputLabel>Año</InputLabel>
-          <Select value={filters.year} label="Año" onChange={handleFilterChange('year')}>
+          <InputLabel>Ano</InputLabel>
+          <Select value={filters.year} label="Ano" onChange={handleFilterChange('year')}>
             {YEARS.map((y) => (
               <MenuItem key={y} value={y === 'Todos' ? 'all' : y}>{y}</MenuItem>
+            ))}
+          </Select>
+        </FormControl>
+
+        <FormControl size="small" sx={{ minWidth: 120 }}>
+          <InputLabel>Segmento</InputLabel>
+          <Select value={filters.segment} label="Segmento" onChange={handleFilterChange('segment')}>
+            <MenuItem value="all">Todos</MenuItem>
+            {segments.map((s) => (
+              <MenuItem key={s} value={s}>{s}</MenuItem>
+            ))}
+          </Select>
+        </FormControl>
+
+        <FormControl size="small" sx={{ minWidth: 150 }}>
+          <InputLabel>Distribuidora</InputLabel>
+          <Select value={filters.distributor} label="Distribuidora" onChange={handleFilterChange('distributor')}>
+            <MenuItem value="all">Todas</MenuItem>
+            {distributors.map((d) => (
+              <MenuItem key={d} value={d}>{d}</MenuItem>
             ))}
           </Select>
         </FormControl>
@@ -256,19 +350,19 @@ export default function LogisticsPage({ currentIndex = 5, totalPages = 6, onPrev
             format: 'decimal',
             icon: <TimerIcon sx={{ fontSize: 18 }} />,
             color: '#003399',
-            changeLabel: 'días lab.',
+            changeLabel: 'dias lab.',
           },
         ]}
       />
 
-      {/* Gráficos */}
+      {/* Graficos */}
       <Grid container spacing={{ xs: 1.5, sm: 2, md: 3 }} sx={{ mb: { xs: 2, sm: 3 } }}>
-        {/* Despachos por Día */}
+        {/* Despachos por Dia */}
         <Grid item xs={12} md={8}>
           <Card elevation={0} sx={{ border: '1px solid', borderColor: 'divider', height: 400 }}>
             <CardContent sx={{ p: { xs: 1.5, sm: 2, md: 3 }, height: '100%' }}>
               <Typography variant="h6" sx={{ fontWeight: 600, mb: 2, color: 'primary.main', fontSize: { xs: '0.95rem', sm: '1.1rem' } }}>
-                Despachos y Entregas por Día
+                Despachos y Entregas por Dia
               </Typography>
               {loadingDispatches ? (
                 <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: 300 }}>
@@ -305,7 +399,7 @@ export default function LogisticsPage({ currentIndex = 5, totalPages = 6, onPrev
           <Card elevation={0} sx={{ border: '1px solid', borderColor: 'divider', height: 400 }}>
             <CardContent sx={{ p: { xs: 1.5, sm: 2, md: 3 }, height: '100%' }}>
               <Typography variant="h6" sx={{ fontWeight: 600, mb: 2, color: 'primary.main', fontSize: { xs: '0.95rem', sm: '1.1rem' } }}>
-                Entregas a Tiempo (Meta: {onTimeData?.data?.targetDays || 15} días lab.)
+                Entregas a Tiempo (Meta: {onTimeData?.data?.targetDays || 15} dias lab.)
               </Typography>
               {loadingOnTime ? (
                 <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: 280 }}>
@@ -339,12 +433,174 @@ export default function LogisticsPage({ currentIndex = 5, totalPages = 6, onPrev
         </Grid>
       </Grid>
 
+      {/* Rankings de Distribuidoras */}
+      <Grid container spacing={{ xs: 1.5, sm: 2, md: 3 }} sx={{ mb: { xs: 2, sm: 3 } }}>
+        {/* Ranking por Total de Solicitudes */}
+        <Grid item xs={12} md={6}>
+          <Card elevation={0} sx={{ border: '1px solid', borderColor: 'divider' }}>
+            <CardContent sx={{ p: { xs: 1.5, sm: 2, md: 3 } }}>
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 2 }}>
+                <EmojiEventsIcon sx={{ color: '#FFD700' }} />
+                <Typography variant="h6" sx={{ fontWeight: 600, color: 'primary.main', fontSize: { xs: '0.95rem', sm: '1.1rem' } }}>
+                  Ranking Distribuidoras por Solicitudes
+                </Typography>
+              </Box>
+              {loadingRanking ? (
+                <Box sx={{ display: 'flex', justifyContent: 'center', py: 4 }}>
+                  <CircularProgress />
+                </Box>
+              ) : (
+                <>
+                  <TableContainer>
+                    <Table size="small">
+                      <TableHead>
+                        <TableRow>
+                          <TableCell sx={{ fontWeight: 600, width: 50 }}>#</TableCell>
+                          <TableCell sx={{ fontWeight: 600 }}>Distribuidora</TableCell>
+                          <TableCell align="right" sx={{ fontWeight: 600 }}>Total</TableCell>
+                          <TableCell align="right" sx={{ fontWeight: 600 }}>Entregados</TableCell>
+                          <TableCell align="right" sx={{ fontWeight: 600 }}>Pendientes</TableCell>
+                        </TableRow>
+                      </TableHead>
+                      <TableBody>
+                        {distributorRanking?.data?.items.map((row) => (
+                          <TableRow key={row.rank} hover>
+                            <TableCell>
+                              <Chip
+                                label={row.rank}
+                                size="small"
+                                sx={{
+                                  minWidth: 28,
+                                  fontWeight: 600,
+                                  fontSize: '0.75rem',
+                                  bgcolor: row.rank <= 3 ? '#FFF3E0' : '#F5F5F5',
+                                  color: row.rank <= 3 ? '#E65100' : '#666',
+                                }}
+                              />
+                            </TableCell>
+                            <TableCell sx={{ fontSize: '0.8rem', maxWidth: 180, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                              {row.distributor}
+                            </TableCell>
+                            <TableCell align="right" sx={{ fontWeight: 600, fontSize: '0.85rem' }}>
+                              {row.totalRequests.toLocaleString()}
+                            </TableCell>
+                            <TableCell align="right" sx={{ fontSize: '0.8rem', color: '#4CAF50' }}>
+                              {row.delivered.toLocaleString()}
+                            </TableCell>
+                            <TableCell align="right" sx={{ fontSize: '0.8rem', color: '#FF9800' }}>
+                              {row.pending.toLocaleString()}
+                            </TableCell>
+                          </TableRow>
+                        ))}
+                      </TableBody>
+                    </Table>
+                  </TableContainer>
+                  <TablePagination
+                    component="div"
+                    count={distributorRanking?.data?.total || 0}
+                    page={rankingPage}
+                    onPageChange={(_, newPage) => setRankingPage(newPage)}
+                    rowsPerPage={10}
+                    rowsPerPageOptions={[10]}
+                    labelDisplayedRows={({ from, to, count }) => `${from}-${to} de ${count}`}
+                  />
+                </>
+              )}
+            </CardContent>
+          </Card>
+        </Grid>
+
+        {/* Ranking por Solicitudes Retrasadas */}
+        <Grid item xs={12} md={6}>
+          <Card elevation={0} sx={{ border: '1px solid', borderColor: 'divider' }}>
+            <CardContent sx={{ p: { xs: 1.5, sm: 2, md: 3 } }}>
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 2 }}>
+                <WarningIcon sx={{ color: '#F44336' }} />
+                <Typography variant="h6" sx={{ fontWeight: 600, color: 'primary.main', fontSize: { xs: '0.95rem', sm: '1.1rem' } }}>
+                  Ranking Distribuidoras por Retrasos
+                </Typography>
+              </Box>
+              {loadingDelayedRanking ? (
+                <Box sx={{ display: 'flex', justifyContent: 'center', py: 4 }}>
+                  <CircularProgress />
+                </Box>
+              ) : !delayedRanking?.data?.items.length ? (
+                <Typography variant="body2" color="text.secondary" sx={{ py: 4, textAlign: 'center' }}>
+                  No hay distribuidoras con retrasos
+                </Typography>
+              ) : (
+                <>
+                  <TableContainer>
+                    <Table size="small">
+                      <TableHead>
+                        <TableRow>
+                          <TableCell sx={{ fontWeight: 600, width: 50 }}>#</TableCell>
+                          <TableCell sx={{ fontWeight: 600 }}>Distribuidora</TableCell>
+                          <TableCell align="right" sx={{ fontWeight: 600 }}>Retrasadas</TableCell>
+                          <TableCell align="right" sx={{ fontWeight: 600 }}>Prom. Dias</TableCell>
+                        </TableRow>
+                      </TableHead>
+                      <TableBody>
+                        {delayedRanking?.data?.items.map((row) => (
+                          <TableRow key={row.rank} hover>
+                            <TableCell>
+                              <Chip
+                                label={row.rank}
+                                size="small"
+                                sx={{
+                                  minWidth: 28,
+                                  fontWeight: 600,
+                                  fontSize: '0.75rem',
+                                  bgcolor: row.rank <= 3 ? '#FFEBEE' : '#F5F5F5',
+                                  color: row.rank <= 3 ? '#C62828' : '#666',
+                                }}
+                              />
+                            </TableCell>
+                            <TableCell sx={{ fontSize: '0.8rem', maxWidth: 180, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                              {row.distributor}
+                            </TableCell>
+                            <TableCell align="right">
+                              <Chip
+                                label={row.delayedRequests}
+                                size="small"
+                                sx={{
+                                  fontWeight: 600,
+                                  fontSize: '0.75rem',
+                                  bgcolor: '#FFEBEE',
+                                  color: '#C62828',
+                                }}
+                              />
+                            </TableCell>
+                            <TableCell align="right" sx={{ fontSize: '0.8rem', color: '#F44336', fontWeight: 500 }}>
+                              +{row.avgDelayDays}
+                            </TableCell>
+                          </TableRow>
+                        ))}
+                      </TableBody>
+                    </Table>
+                  </TableContainer>
+                  <TablePagination
+                    component="div"
+                    count={delayedRanking?.data?.total || 0}
+                    page={delayedRankingPage}
+                    onPageChange={(_, newPage) => setDelayedRankingPage(newPage)}
+                    rowsPerPage={10}
+                    rowsPerPageOptions={[10]}
+                    labelDisplayedRows={({ from, to, count }) => `${from}-${to} de ${count}`}
+                  />
+                </>
+              )}
+            </CardContent>
+          </Card>
+        </Grid>
+      </Grid>
+
       {/* Tabla de Solicitudes Retrasadas */}
       <Card elevation={0} sx={{ border: '1px solid', borderColor: 'divider' }}>
         <CardContent sx={{ p: { xs: 1.5, sm: 2, md: 3 } }}>
           <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
             <Typography variant="h6" sx={{ fontWeight: 600, color: 'primary.main', fontSize: { xs: '0.95rem', sm: '1.1rem' } }}>
-              Solicitudes Retrasadas (+15 días laborables)
+              Solicitudes Retrasadas (+15 dias laborables)
             </Typography>
             <Tooltip title="Descargar CSV">
               <IconButton
@@ -371,12 +627,12 @@ export default function LogisticsPage({ currentIndex = 5, totalPages = 6, onPrev
               <Table size="small" stickyHeader>
                 <TableHead>
                   <TableRow>
-                    <TableCell sx={{ fontWeight: 600, bgcolor: 'background.paper' }}>Código</TableCell>
+                    <TableCell sx={{ fontWeight: 600, bgcolor: 'background.paper' }}>Codigo</TableCell>
                     <TableCell sx={{ fontWeight: 600, bgcolor: 'background.paper' }}>Participante</TableCell>
                     <TableCell sx={{ fontWeight: 600, bgcolor: 'background.paper' }}>Premio</TableCell>
                     <TableCell sx={{ fontWeight: 600, bgcolor: 'background.paper' }}>Fecha Solicitado</TableCell>
                     <TableCell sx={{ fontWeight: 600, bgcolor: 'background.paper' }}>Estado</TableCell>
-                    <TableCell align="right" sx={{ fontWeight: 600, bgcolor: 'background.paper' }}>Días Retraso</TableCell>
+                    <TableCell align="right" sx={{ fontWeight: 600, bgcolor: 'background.paper' }}>Dias Retraso</TableCell>
                   </TableRow>
                 </TableHead>
                 <TableBody>
