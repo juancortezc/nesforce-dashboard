@@ -65,8 +65,8 @@ export default function Dashboard() {
 
       <Box sx={{ display: "flex", flexDirection: "column", minHeight: "100vh" }}>
         <Header
-          dateRange={dateRange}
-          onDateRangeChange={handleDateRangeChange}
+          dateRange={activeTab !== 5 ? dateRange : undefined}
+          onDateRangeChange={activeTab !== 5 ? handleDateRangeChange : undefined}
         />
         <Box
           component="main"
