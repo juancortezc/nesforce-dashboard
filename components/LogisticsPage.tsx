@@ -50,6 +50,8 @@ import { DateRange } from './Header';
 const fetcher = (url: string) => fetch(url).then((r) => r.json());
 
 const MONTHS = ['Todos', 'Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'];
+const CURRENT_YEAR = new Date().getFullYear().toString();
+const YEARS = ['Todos', '2024', '2025', '2026'];
 
 interface LogisticsPageProps {
   currentIndex?: number;
@@ -104,11 +106,13 @@ const STATUS_LABELS: Record<string, string> = {
 export default function LogisticsPage({ currentIndex = 5, totalPages = 6, onPrevious, onNext }: LogisticsPageProps) {
   const [filters, setFilters] = useState({
     month: 'all',
+    year: CURRENT_YEAR,
   });
 
   const queryString = useMemo(() => {
     const params = new URLSearchParams();
     if (filters.month !== 'all') params.append('month', filters.month);
+    if (filters.year !== 'all') params.append('year', filters.year);
     return params.toString();
   }, [filters]);
 
@@ -142,10 +146,11 @@ export default function LogisticsPage({ currentIndex = 5, totalPages = 6, onPrev
   const handleClearFilters = () => {
     setFilters({
       month: 'all',
+      year: CURRENT_YEAR,
     });
   };
 
-  const hasFilters = filters.month !== 'all';
+  const hasFilters = filters.month !== 'all' || filters.year !== CURRENT_YEAR;
 
   const formatNumber = (num: number) => num.toLocaleString('es-ES');
 
@@ -193,6 +198,15 @@ export default function LogisticsPage({ currentIndex = 5, totalPages = 6, onPrev
           <Select value={filters.month} label="Mes" onChange={handleFilterChange('month')}>
             {MONTHS.map((m, i) => (
               <MenuItem key={i} value={i === 0 ? 'all' : i.toString()}>{m}</MenuItem>
+            ))}
+          </Select>
+        </FormControl>
+
+        <FormControl size="small" sx={{ minWidth: 80 }}>
+          <InputLabel>Año</InputLabel>
+          <Select value={filters.year} label="Año" onChange={handleFilterChange('year')}>
+            {YEARS.map((y) => (
+              <MenuItem key={y} value={y === 'Todos' ? 'all' : y}>{y}</MenuItem>
             ))}
           </Select>
         </FormControl>

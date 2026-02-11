@@ -26,7 +26,7 @@ export default async function handler(
   }
 
   try {
-    const { month } = req.query;
+    const { month, year } = req.query;
     const client = getBigQueryClient();
 
     let whereClause = `
@@ -36,6 +36,9 @@ export default async function handler(
     `;
     if (month && month !== 'all') {
       whereClause += ` AND EXTRACT(MONTH FROM request_delivered_at) = ${parseInt(month as string)}`;
+    }
+    if (year && year !== 'all') {
+      whereClause += ` AND EXTRACT(YEAR FROM request_delivered_at) = ${parseInt(year as string)}`;
     }
 
     const query = `

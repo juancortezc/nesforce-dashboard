@@ -23,12 +23,15 @@ export default async function handler(
   }
 
   try {
-    const { month } = req.query;
+    const { month, year } = req.query;
     const client = getBigQueryClient();
 
     let whereClause = 'WHERE 1=1';
     if (month && month !== 'all') {
       whereClause += ` AND EXTRACT(MONTH FROM request_requested_at) = ${parseInt(month as string)}`;
+    }
+    if (year && year !== 'all') {
+      whereClause += ` AND EXTRACT(YEAR FROM request_requested_at) = ${parseInt(year as string)}`;
     }
 
     // Query para contar por estado
