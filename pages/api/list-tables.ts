@@ -15,7 +15,7 @@ export default async function handler(
   try {
     const query = `
       SELECT table_name
-      FROM \`lala4-377416.lala4.INFORMATION_SCHEMA.TABLES\`
+      FROM \`lala4-377416.nesforce.INFORMATION_SCHEMA.TABLES\`
       ORDER BY table_name
     `;
 

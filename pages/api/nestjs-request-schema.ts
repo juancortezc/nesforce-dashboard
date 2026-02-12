@@ -30,8 +30,8 @@ export default async function handler(
         column_name,
         data_type,
         is_nullable
-      FROM \`lala4-377416.lala4.INFORMATION_SCHEMA.COLUMNS\`
-      WHERE table_name = 'nestjsRequests'
+      FROM \`lala4-377416.nesforce.INFORMATION_SCHEMA.COLUMNS\`
+      WHERE table_name = 'requests_nesforce'
       ORDER BY ordinal_position
     `;
 

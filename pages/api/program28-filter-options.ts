@@ -5,29 +5,29 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   if (req.method !== 'GET') return res.status(405).json({ success: false, error: 'Method not allowed' });
 
   try {
-    const regionsQuery = `
-      SELECT DISTINCT participant_group_region_name
-      FROM ${TABLES.NESTJS_REQUESTS}
-      WHERE participant_program_id = 28 AND participant_group_region_name IS NOT NULL AND LOWER(request_status) != 'cancelado'
-      ORDER BY participant_group_region_name
+    const distributorsQuery = `
+      SELECT DISTINCT distribuidora
+      FROM ${TABLES.REQUESTS}
+      WHERE distribuidora IS NOT NULL AND LOWER(request_status) != 'cancelado'
+      ORDER BY distribuidora
     `;
 
     const categoriesQuery = `
       SELECT DISTINCT award_categories
-      FROM ${TABLES.NESTJS_REQUESTS}
-      WHERE participant_program_id = 28 AND award_categories IS NOT NULL AND LOWER(request_status) != 'cancelado'
+      FROM ${TABLES.REQUESTS}
+      WHERE award_categories IS NOT NULL AND LOWER(request_status) != 'cancelado'
       ORDER BY award_categories
     `;
 
     const segmentsQuery = `
-      SELECT DISTINCT participant_segment_name
-      FROM ${TABLES.NESTJS_REQUESTS}
-      WHERE participant_program_id = 28 AND participant_segment_name IS NOT NULL AND LOWER(request_status) != 'cancelado'
-      ORDER BY participant_segment_name
+      SELECT DISTINCT segmento
+      FROM ${TABLES.REQUESTS}
+      WHERE segmento IS NOT NULL AND LOWER(request_status) != 'cancelado'
+      ORDER BY segmento
     `;
 
-    const [regionsRows, categoriesRows, segmentsRows] = await Promise.all([
-      executeQuery(regionsQuery),
+    const [distributorsRows, categoriesRows, segmentsRows] = await Promise.all([
+      executeQuery(distributorsQuery),
       executeQuery(categoriesQuery),
       executeQuery(segmentsQuery),
     ]);
@@ -35,9 +35,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     return res.status(200).json({
       success: true,
       data: {
-        regions: regionsRows.map((row: any) => row.participant_group_region_name),
+        distributors: distributorsRows.map((row: any) => row.distribuidora),
         categories: categoriesRows.map((row: any) => row.award_categories),
-        segments: segmentsRows.map((row: any) => row.participant_segment_name),
+        segments: segmentsRows.map((row: any) => row.segmento),
       },
     });
   } catch (error) {

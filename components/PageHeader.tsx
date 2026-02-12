@@ -3,6 +3,7 @@
 import { Box, Typography, Chip, useTheme, useMediaQuery, IconButton, Tooltip } from "@mui/material";
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
+import PageInfoDialog, { PageInfoConfig } from "./PageInfoDialog";
 
 interface PageHeaderProps {
   title: string;
@@ -12,6 +13,7 @@ interface PageHeaderProps {
   totalPages?: number;
   onPrevious?: () => void;
   onNext?: () => void;
+  pageInfo?: PageInfoConfig;
 }
 
 export function PageHeader({
@@ -22,6 +24,7 @@ export function PageHeader({
   totalPages = 5,
   onPrevious,
   onNext,
+  pageInfo,
 }: PageHeaderProps) {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
@@ -53,6 +56,7 @@ export function PageHeader({
         >
           {title}
         </Typography>
+        {pageInfo && <PageInfoDialog config={pageInfo} />}
         {!isMobile && chipLabel && icon && (
           <Chip
             icon={icon as React.ReactElement}

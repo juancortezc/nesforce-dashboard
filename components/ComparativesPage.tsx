@@ -43,6 +43,7 @@ import { PageHeader } from './PageHeader';
 import { FiltersCard } from './FiltersCard';
 import { KPICards } from './KPICards';
 import { DateRange } from './Header';
+import { comparativesPageInfo } from '@/config/pageInfoConfigs';
 
 const fetcher = (url: string) => fetch(url).then((r) => r.json());
 
@@ -100,10 +101,23 @@ export default function ComparativesPage({ currentIndex = 4, totalPages = 5, onP
     return params.toString();
   }, [filters]);
 
-  const { data: summaryData, isLoading: loadingSummary } = useSWR(`/api/comparatives-summary?${queryString}`, fetcher);
-  const { data: trendData, isLoading: loadingTrend } = useSWR(`/api/comparatives-trend?${queryString}`, fetcher);
-  const { data: kpiData, isLoading: loadingKpi } = useSWR(`/api/comparatives-by-kpi?${queryString}`, fetcher);
-  const { data: distributorData, isLoading: loadingDistributor } = useSWR(`/api/comparatives-by-distributor?${queryString}`, fetcher);
+  // Only fetch data when position is set (required filter)
+  const { data: summaryData, isLoading: loadingSummary } = useSWR(
+    filters.position ? `/api/comparatives-summary?${queryString}` : null,
+    fetcher
+  );
+  const { data: trendData, isLoading: loadingTrend } = useSWR(
+    filters.position ? `/api/comparatives-trend?${queryString}` : null,
+    fetcher
+  );
+  const { data: kpiData, isLoading: loadingKpi } = useSWR(
+    filters.position ? `/api/comparatives-by-kpi?${queryString}` : null,
+    fetcher
+  );
+  const { data: distributorData, isLoading: loadingDistributor } = useSWR(
+    filters.position ? `/api/comparatives-by-distributor?${queryString}` : null,
+    fetcher
+  );
 
   const handleFilterChange = (field: keyof typeof filters) => (event: SelectChangeEvent) => {
     const newValue = event.target.value;
@@ -154,6 +168,7 @@ export default function ComparativesPage({ currentIndex = 4, totalPages = 5, onP
         totalPages={totalPages}
         onPrevious={onPrevious}
         onNext={onNext}
+        pageInfo={comparativesPageInfo}
       />
 
       <FiltersCard title="Filtros Comparativos">
@@ -288,6 +303,13 @@ export default function ComparativesPage({ currentIndex = 4, totalPages = 5, onP
           },
         ]}
       />
+
+      <Typography variant="caption" sx={{ display: 'block', mb: 2, color: 'text.secondary', fontStyle: 'italic' }}>
+        * El filtro de Cargo es obligatorio. Los supervisores suman los resultados de sus vendedores.
+        {summaryData?.data?.currentPeriod?.label && (
+          <> — Datos completos hasta: <strong>{summaryData.data.currentPeriod.label}</strong></>
+        )}
+      </Typography>
 
       {/* Gráfico de Tendencia */}
       <Card elevation={0} sx={{ border: '1px solid', borderColor: 'divider', mb: { xs: 2, sm: 3 } }}>

@@ -34,15 +34,15 @@ export default async function handler(
   }
 
   try {
-    const { month, year, region, category, segment } = req.query;
+    const { month, year, distributor, category, segment } = req.query;
 
-    let whereClause = 'WHERE participant_program_id = 28 AND LOWER(request_status) != \'cancelado\'';
+    let whereClause = 'WHERE LOWER(request_status) != \'cancelado\'';
 
-    if (region && region !== '') whereClause += ` AND participant_group_region_name = @region`;
+    if (distributor && distributor !== 'all') whereClause += ` AND distribuidora = @distributor`;
     if (month && month !== 'all') whereClause += ` AND EXTRACT(MONTH FROM request_requested_at) = @month`;
     if (year && year !== 'all') whereClause += ` AND EXTRACT(YEAR FROM request_requested_at) = @year`;
     if (category && category !== 'all') whereClause += ` AND award_categories LIKE @category`;
-    if (segment && segment !== 'all') whereClause += ` AND participant_segment_name = @segment`;
+    if (segment && segment !== 'all') whereClause += ` AND segmento = @segment`;
 
     const summaryQuery = `
       SELECT
@@ -50,7 +50,7 @@ export default async function handler(
         SUM(request_points) as total_points,
         COUNT(DISTINCT request_participant_id) as total_participants,
         COUNT(DISTINCT request_award_id) as total_awards
-      FROM ${TABLES.NESTJS_REQUESTS}
+      FROM ${TABLES.REQUESTS}
       ${whereClause}
     `;
 
@@ -62,14 +62,14 @@ export default async function handler(
         SUM(request_points) as total_points,
         COUNT(DISTINCT request_participant_id) as unique_participants,
         COUNT(DISTINCT request_award_id) as unique_awards
-      FROM ${TABLES.NESTJS_REQUESTS}
+      FROM ${TABLES.REQUESTS}
       ${whereClause}
       GROUP BY year, month
       ORDER BY year, month
     `;
 
     const params: any = {};
-    if (region && region !== '') params.region = region;
+    if (distributor && distributor !== 'all') params.distributor = distributor;
     if (month && month !== 'all') params.month = parseInt(month as string);
     if (year && year !== 'all') params.year = parseInt(year as string);
     if (category && category !== 'all') params.category = `%${category}%`;

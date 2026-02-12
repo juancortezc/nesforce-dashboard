@@ -98,7 +98,7 @@ export default async function handler(
 
     const whereClause = whereConditions.join(' AND ');
 
-    // Query para obtener todos los períodos con datos
+    // Query para obtener todos los períodos con datos (solo con achieved data)
     const query = `
       SELECT
         result_year as year,
@@ -112,6 +112,7 @@ export default async function handler(
       WHERE ${whereClause}
         AND result_month IS NOT NULL
         AND result_year IS NOT NULL
+        AND achieved IS NOT NULL
       GROUP BY result_year, result_month
       ORDER BY result_year ASC, result_month ASC
     `;

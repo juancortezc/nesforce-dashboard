@@ -14,14 +14,30 @@ interface DistributorSales {
   transactionCount: number;
 }
 
+interface DateRange {
+  fromMonth: number;
+  fromYear: number;
+  toMonth: number;
+  toYear: number;
+}
+
 interface DistributorSalesCardProps {
   month?: string;
   year?: string;
+  dateRange?: DateRange;
 }
 
-export default function DistributorSalesCard({ month = 'all', year = 'all' }: DistributorSalesCardProps) {
+export default function DistributorSalesCard({ month = 'all', year = 'all', dateRange }: DistributorSalesCardProps) {
+  const queryParams = new URLSearchParams({ month, year });
+  if (dateRange) {
+    queryParams.append('fromMonth', dateRange.fromMonth.toString());
+    queryParams.append('fromYear', dateRange.fromYear.toString());
+    queryParams.append('toMonth', dateRange.toMonth.toString());
+    queryParams.append('toYear', dateRange.toYear.toString());
+  }
+
   const { data, error, isLoading } = useSWR<{ success: boolean; data?: DistributorSales[] }>(
-    `/api/transactions-by-distributor?month=${month}&year=${year}`,
+    `/api/transactions-by-distributor?${queryParams.toString()}`,
     fetcher
   );
 

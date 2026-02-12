@@ -127,7 +127,7 @@ export function BottomNav({ activeTab, onTabChange }: BottomNavProps) {
           borderRadius: 0,
           borderTop: "1px solid",
           borderColor: "divider",
-          backgroundColor: isDesktop ? "primary.main" : "background.paper",
+          backgroundColor: isDesktop ? "#1a237e" : "background.paper",
           pb: "env(safe-area-inset-bottom)",
         }}
       >

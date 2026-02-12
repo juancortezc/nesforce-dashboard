@@ -27,9 +27,24 @@ export default async function handler(
   }
 
   try {
-    const { distributor, month, year, category, limit = '20' } = req.query;
+    const { distributor, month, year, category, limit = '20', fromMonth, fromYear, toMonth, toYear } = req.query;
 
     let whereClause = 'WHERE sku_name IS NOT NULL';
+    const params: any = { limit: parseInt(limit as string) };
+
+    // Filtro por rango de fechas del Header
+    if (fromMonth && fromYear && toMonth && toYear) {
+      const startDate = `${fromYear}-${String(fromMonth).padStart(2, '0')}-01`;
+      const endYear = parseInt(toYear as string);
+      const endMonth = parseInt(toMonth as string);
+      const lastDay = new Date(endYear, endMonth, 0).getDate();
+      const endDate = `${toYear}-${String(toMonth).padStart(2, '0')}-${lastDay}`;
+
+      whereClause += ` AND SAFE.PARSE_DATE('%d/%m/%Y', fecha) >= @startDate`;
+      whereClause += ` AND SAFE.PARSE_DATE('%d/%m/%Y', fecha) <= @endDate`;
+      params.startDate = startDate;
+      params.endDate = endDate;
+    }
 
     if (distributor && distributor !== 'all') {
       whereClause += ` AND cod_distribuidor = @distributor`;
@@ -61,7 +76,6 @@ export default async function handler(
       LIMIT @limit
     `;
 
-    const params: any = { limit: parseInt(limit as string) };
     if (distributor && distributor !== 'all') params.distributor = distributor;
     if (month && month !== 'all') params.month = parseInt(month as string);
     if (year && year !== 'all') params.year = parseInt(year as string);

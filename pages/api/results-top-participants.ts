@@ -15,6 +15,10 @@ interface ParticipantPerformance {
 interface TopParticipantsResponse {
   success: boolean;
   data?: ParticipantPerformance[];
+  totalCount?: number;
+  totalPoints?: number;
+  avgAchievement?: number;
+  latestPeriod?: string;
   error?: string;
 }
 
@@ -32,7 +36,7 @@ export default async function handler(
   try {
     const { month, year, region, segment, group, position, route, kpi, limit = '20' } = req.query;
 
-    let whereClause = 'WHERE participant_id IS NOT NULL';
+    let whereClause = 'WHERE participant_id IS NOT NULL AND achieved IS NOT NULL';
 
     if (month && month !== 'all') {
       whereClause += ` AND result_month = @month`;
@@ -95,6 +99,29 @@ export default async function handler(
 
     const rows = await executeQuery(query, params);
 
+    // Get aggregated stats (total participants, points, achievement)
+    const statsQuery = `
+      SELECT
+        COUNT(DISTINCT participant_id) as total_participants,
+        SUM(points) as total_points,
+        SAFE_DIVIDE(SUM(CAST(achieved AS FLOAT64)), SUM(CAST(target AS FLOAT64))) * 100 as avg_achievement,
+        MAX(result_year) as max_year,
+        MAX(CASE WHEN result_year = (SELECT MAX(result_year) FROM ${TABLES.RESULTS} ${whereClause}) THEN result_month ELSE 0 END) as max_month
+      FROM ${TABLES.RESULTS}
+      ${whereClause}
+    `;
+    const statsRows = await executeQuery(statsQuery, params);
+    const stats = statsRows[0] || {};
+
+    const monthNames = ['', 'Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'];
+    const latestPeriod = stats.max_year && stats.max_month
+      ? `${monthNames[Number(stats.max_month)]} ${stats.max_year}`
+      : undefined;
+
+    const totalCount = Number(stats.total_participants) || 0;
+    const totalPoints = Math.round(Number(stats.total_points) || 0);
+    const avgAchievement = Math.round((Number(stats.avg_achievement) || 0) * 10) / 10;
+
     const participantData: ParticipantPerformance[] = rows.map((row: any) => ({
       participantId: Number(row.participant_id),
       participantName: row.participant_name || 'Sin nombre',
@@ -109,6 +136,10 @@ export default async function handler(
     return res.status(200).json({
       success: true,
       data: participantData,
+      totalCount,
+      totalPoints,
+      avgAchievement,
+      latestPeriod,
     });
   } catch (error) {
     console.error('Error fetching top participants:', error);

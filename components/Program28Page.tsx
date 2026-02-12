@@ -12,6 +12,7 @@ import { PageHeader } from './PageHeader';
 import { FiltersCard } from './FiltersCard';
 import { KPICards } from './KPICards';
 import { DateRange } from './Header';
+import { program28PageInfo } from '@/config/pageInfoConfigs';
 
 const fetcher = (url: string) => fetch(url).then((r) => r.json());
 
@@ -93,6 +94,7 @@ export default function Program28Page({ currentIndex = 3, totalPages = 5, onPrev
         totalPages={totalPages}
         onPrevious={onPrevious}
         onNext={onNext}
+        pageInfo={program28PageInfo}
       />
 
       <FiltersCard>

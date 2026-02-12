@@ -5,14 +5,14 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   if (req.method !== 'GET') return res.status(405).json({ success: false, error: 'Method not allowed' });
 
   try {
-    const { month, year, region, category, segment, limit = '20' } = req.query;
+    const { month, year, distributor, category, segment, limit = '20' } = req.query;
 
-    let whereClause = 'WHERE participant_program_id = 28 AND LOWER(request_status) != \'cancelado\'';
-    if (region && region !== '') whereClause += ` AND participant_group_region_name = @region`;
+    let whereClause = 'WHERE LOWER(request_status) != \'cancelado\'';
+    if (distributor && distributor !== 'all') whereClause += ` AND distribuidora = @distributor`;
     if (month && month !== 'all') whereClause += ` AND EXTRACT(MONTH FROM request_requested_at) = @month`;
     if (year && year !== 'all') whereClause += ` AND EXTRACT(YEAR FROM request_requested_at) = @year`;
     if (category && category !== 'all') whereClause += ` AND award_categories LIKE @category`;
-    if (segment && segment !== 'all') whereClause += ` AND participant_segment_name = @segment`;
+    if (segment && segment !== 'all') whereClause += ` AND segmento = @segment`;
 
     const query = `
       SELECT
@@ -22,7 +22,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         COUNT(*) as total_redemptions,
         SUM(request_points) as total_points,
         COUNT(DISTINCT request_award_id) as unique_awards
-      FROM ${TABLES.NESTJS_REQUESTS}
+      FROM ${TABLES.REQUESTS}
       ${whereClause}
       GROUP BY participant_id, participant_name, participant_identifier
       ORDER BY total_redemptions DESC
@@ -30,7 +30,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     `;
 
     const params: any = { limit: parseInt(limit as string) };
-    if (region && region !== '') params.region = region;
+    if (distributor && distributor !== 'all') params.distributor = distributor;
     if (month && month !== 'all') params.month = parseInt(month as string);
     if (year && year !== 'all') params.year = parseInt(year as string);
     if (category && category !== 'all') params.category = `%${category}%`;

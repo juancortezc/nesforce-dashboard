@@ -22,6 +22,7 @@ import { PageHeader } from './PageHeader';
 import { FiltersCard } from './FiltersCard';
 import { KPICards } from './KPICards';
 import { DateRange } from './Header';
+import { transactionsPageInfo } from '@/config/pageInfoConfigs';
 
 const fetcher = (url: string) => fetch(url).then((r) => r.json());
 
@@ -71,6 +72,12 @@ export default function TransactionsPage({ currentIndex = 1, totalPages = 5, onP
 
   const kpiQueryString = useMemo(() => {
     const params = new URLSearchParams();
+    if (dateRange) {
+      params.append('fromMonth', dateRange.fromMonth.toString());
+      params.append('fromYear', dateRange.fromYear.toString());
+      params.append('toMonth', dateRange.toMonth.toString());
+      params.append('toYear', dateRange.toYear.toString());
+    }
     if (filters.month !== 'all') params.append('month', filters.month);
     if (filters.distributor !== 'all') params.append('distributor', filters.distributor);
     if (filters.categoria !== 'all') params.append('categoria', filters.categoria);
@@ -79,10 +86,10 @@ export default function TransactionsPage({ currentIndex = 1, totalPages = 5, onP
     if (filters.exclude !== 'all') params.append('exclude', filters.exclude);
     if (filters.promo !== 'all') params.append('promo', filters.promo);
     return params.toString();
-  }, [filters]);
+  }, [filters, dateRange]);
 
   const { data: salesData, isLoading: isLoadingSales } = useSWR<{ success: boolean; data?: MonthlySalesData[] }>(
-    `/api/sales-monthly${kpiQueryString ? `?${kpiQueryString}` : ''}`,
+    `/api/transactions-monthly${kpiQueryString ? `?${kpiQueryString}` : ''}`,
     fetcher
   );
 
@@ -121,6 +128,7 @@ export default function TransactionsPage({ currentIndex = 1, totalPages = 5, onP
         totalPages={totalPages}
         onPrevious={onPrevious}
         onNext={onNext}
+        pageInfo={transactionsPageInfo}
       />
 
       <FiltersCard>
@@ -235,19 +243,19 @@ export default function TransactionsPage({ currentIndex = 1, totalPages = 5, onP
 
       <Grid container spacing={{ xs: 1.5, sm: 2, md: 3 }}>
         <Grid item xs={12}>
-          <MonthlySalesCard {...filters} />
+          <MonthlySalesCard {...filters} dateRange={dateRange} />
         </Grid>
 
         <Grid item xs={12}>
-          <CategorySalesCard {...filters} />
+          <CategorySalesCard {...filters} dateRange={dateRange} />
         </Grid>
 
         <Grid item xs={12}>
-          <TopProductsCard {...filters} />
+          <TopProductsCard {...filters} dateRange={dateRange} />
         </Grid>
 
         <Grid item xs={12}>
-          <DistributorSalesCard {...filters} />
+          <DistributorSalesCard {...filters} dateRange={dateRange} />
         </Grid>
       </Grid>
     </Box>

@@ -87,7 +87,7 @@ export default async function handler(
 
     const baseWhere = whereConditions.join(' AND ');
 
-    // Obtener períodos con datos disponibles
+    // Obtener períodos con datos disponibles (solo períodos con achieved data)
     const periodsQuery = `
       SELECT DISTINCT
         result_year,
@@ -97,6 +97,7 @@ export default async function handler(
       WHERE ${baseWhere}
         AND result_month IS NOT NULL
         AND result_year IS NOT NULL
+        AND achieved IS NOT NULL
       ORDER BY result_year DESC, result_month DESC
       LIMIT 10
     `;

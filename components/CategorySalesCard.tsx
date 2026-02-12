@@ -13,15 +13,31 @@ interface CategorySales {
   transactionCount: number;
 }
 
+interface DateRange {
+  fromMonth: number;
+  fromYear: number;
+  toMonth: number;
+  toYear: number;
+}
+
 interface CategorySalesCardProps {
   distributor?: string;
   month?: string;
   year?: string;
+  dateRange?: DateRange;
 }
 
-export default function CategorySalesCard({ distributor = 'all', month = 'all', year = 'all' }: CategorySalesCardProps) {
+export default function CategorySalesCard({ distributor = 'all', month = 'all', year = 'all', dateRange }: CategorySalesCardProps) {
+  const queryParams = new URLSearchParams({ distributor, month, year });
+  if (dateRange) {
+    queryParams.append('fromMonth', dateRange.fromMonth.toString());
+    queryParams.append('fromYear', dateRange.fromYear.toString());
+    queryParams.append('toMonth', dateRange.toMonth.toString());
+    queryParams.append('toYear', dateRange.toYear.toString());
+  }
+
   const { data, error, isLoading } = useSWR<{ success: boolean; data?: CategorySales[] }>(
-    `/api/transactions-by-category?distributor=${distributor}&month=${month}&year=${year}`,
+    `/api/transactions-by-category?${queryParams.toString()}`,
     fetcher
   );
 

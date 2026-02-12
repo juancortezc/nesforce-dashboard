@@ -46,11 +46,11 @@ export function getBigQueryClient(): BigQuery {
     logger.info('🔑 Credenciales escritas en archivo temporal:', credentialsPath);
 
     // Crear cliente de BigQuery con las credenciales
-    // IMPORTANTE: El dataset lala4 está en southamerica-east1
+    // IMPORTANTE: El dataset nesforce está en us-central1
     bigqueryClient = new BigQuery({
       keyFilename: credentialsPath,
       projectId: credentials.project_id,
-      location: 'southamerica-east1', // Región donde está el dataset
+      location: 'us-central1', // Región donde está el dataset nesforce
     });
 
     logger.info('✅ Cliente BigQuery configurado correctamente para Nesforce');
@@ -68,14 +68,15 @@ export function getBigQueryClient(): BigQuery {
 
 // Proyecto y dataset de BigQuery
 export const PROJECT_ID = 'lala4-377416';
-export const DATASET_ID = 'lala4';
-export const LOCATION = 'southamerica-east1';
+export const DATASET_ID = 'nesforce';
+export const LOCATION = 'us-central1';
 
-// Tablas principales
+// Tablas principales (migradas a dataset nesforce)
 export const TABLES = {
-  RESULTS: `\`${PROJECT_ID}.${DATASET_ID}.nesforce_results\``,
-  TRANSACTIONS: `\`${PROJECT_ID}.${DATASET_ID}.nestle_transactions\``,
-  NESTJS_REQUESTS: `\`${PROJECT_ID}.${DATASET_ID}.nestjsRequests\``,
+  RESULTS: `\`${PROJECT_ID}.${DATASET_ID}.results_nesforce\``,
+  TRANSACTIONS: `\`${PROJECT_ID}.${DATASET_ID}.transactions_nesforce\``,
+  REQUESTS: `\`${PROJECT_ID}.${DATASET_ID}.requests_nesforce\``,
+  PARTICIPANTS: `\`${PROJECT_ID}.${DATASET_ID}.participants_nesforce\``,
   INFORMATION_SCHEMA: `\`${PROJECT_ID}.${DATASET_ID}.INFORMATION_SCHEMA.COLUMNS\``,
 } as const;
 
@@ -197,7 +198,7 @@ export async function detectTableColumns(tableName: string): Promise<string[]> {
 
 export const BigQueryService = {
   /**
-   * Obtiene datos de nesforce_results
+   * Obtiene datos de results_nesforce
    */
   async getResults(filters?: Record<string, unknown>): Promise<ResultsRow[]> {
     const query = `
@@ -210,7 +211,7 @@ export const BigQueryService = {
   },
 
   /**
-   * Obtiene datos de nestle_transactions
+   * Obtiene datos de transactions_nesforce
    */
   async getTransactions(filters?: Record<string, unknown>): Promise<TransactionsRow[]> {
     const query = `

@@ -33,10 +33,26 @@ export default async function handler(
   }
 
   try {
-    const { distributor, categoria, sapCode, subcategoria, exclude, promo } = req.query;
+    const { distributor, categoria, sapCode, subcategoria, exclude, promo, fromMonth, fromYear, toMonth, toYear } = req.query;
 
     const conditions: string[] = ['fecha IS NOT NULL', 'LENGTH(fecha) >= 8'];
     const params: any = {};
+
+    // Filtro por rango de fechas del Header
+    if (fromMonth && fromYear && toMonth && toYear) {
+      // Crear fecha de inicio (primer día del mes)
+      const startDate = `${fromYear}-${String(fromMonth).padStart(2, '0')}-01`;
+      // Crear fecha de fin (último día del mes)
+      const endYear = parseInt(toYear as string);
+      const endMonth = parseInt(toMonth as string);
+      const lastDay = new Date(endYear, endMonth, 0).getDate();
+      const endDate = `${toYear}-${String(toMonth).padStart(2, '0')}-${lastDay}`;
+
+      conditions.push('SAFE.PARSE_DATE(\'%d/%m/%Y\', fecha) >= @startDate');
+      conditions.push('SAFE.PARSE_DATE(\'%d/%m/%Y\', fecha) <= @endDate');
+      params.startDate = startDate;
+      params.endDate = endDate;
+    }
 
     if (distributor && distributor !== 'all') {
       conditions.push('cod_distribuidor = @distributor');

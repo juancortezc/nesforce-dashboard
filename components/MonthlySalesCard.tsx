@@ -13,6 +13,13 @@ interface MonthlySales {
   transactionCount: number;
 }
 
+interface DateRange {
+  fromMonth: number;
+  fromYear: number;
+  toMonth: number;
+  toYear: number;
+}
+
 interface MonthlySalesCardProps {
   distributor?: string;
   categoria?: string;
@@ -20,6 +27,7 @@ interface MonthlySalesCardProps {
   subcategoria?: string;
   exclude?: string;
   promo?: string;
+  dateRange?: DateRange;
 }
 
 export default function MonthlySalesCard({
@@ -29,6 +37,7 @@ export default function MonthlySalesCard({
   subcategoria = 'all',
   exclude = 'all',
   promo = 'all',
+  dateRange,
 }: MonthlySalesCardProps) {
   const queryParams = new URLSearchParams({
     distributor,
@@ -38,6 +47,13 @@ export default function MonthlySalesCard({
     exclude,
     promo,
   });
+
+  if (dateRange) {
+    queryParams.append('fromMonth', dateRange.fromMonth.toString());
+    queryParams.append('fromYear', dateRange.fromYear.toString());
+    queryParams.append('toMonth', dateRange.toMonth.toString());
+    queryParams.append('toYear', dateRange.toYear.toString());
+  }
 
   const { data, error, isLoading } = useSWR<{ success: boolean; data?: MonthlySales[] }>(
     `/api/transactions-monthly?${queryParams.toString()}`,

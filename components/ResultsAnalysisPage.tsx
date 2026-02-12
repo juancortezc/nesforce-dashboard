@@ -14,6 +14,7 @@ import { PageHeader } from './PageHeader';
 import { FiltersCard } from './FiltersCard';
 import { KPICards } from './KPICards';
 import { DateRange } from './Header';
+import { resultsAnalysisPageInfo } from '@/config/pageInfoConfigs';
 
 const fetcher = (url: string) => fetch(url).then((r) => r.json());
 
@@ -21,11 +22,11 @@ const MONTHS = ['Todos', 'Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago',
 const YEARS = ['Todos', '2024', '2025'];
 
 interface TopParticipant {
-  participantId: string;
+  participantId: number;
   participantName: string;
   groupName: string;
   totalPoints: number;
-  avgAchievementRate: number;
+  achievementRate: number;
   kpiCount: number;
 }
 
@@ -80,16 +81,21 @@ export default function ResultsAnalysisPage({ currentIndex = 2, totalPages = 5, 
     return params.toString();
   }, [month, year, region, segment, group, position, route, kpi]);
 
-  const { data: topParticipantsData, isLoading: isLoadingTop } = useSWR<{ success: boolean; data?: TopParticipant[] }>(
-    position ? `/api/top-participants${kpiQueryString ? `?${kpiQueryString}` : ''}` : null,
+  const { data: topParticipantsData, isLoading: isLoadingTop } = useSWR<{
+    success: boolean;
+    data?: TopParticipant[];
+    totalCount?: number;
+    totalPoints?: number;
+    avgAchievement?: number;
+    latestPeriod?: string;
+  }>(
+    position ? `/api/results-top-participants${kpiQueryString ? `?${kpiQueryString}` : ''}` : null,
     fetcher
   );
 
-  const totalParticipants = topParticipantsData?.data?.length || 0;
-  const avgAchievement = topParticipantsData?.data?.length
-    ? topParticipantsData.data.reduce((sum, p) => sum + p.avgAchievementRate, 0) / topParticipantsData.data.length
-    : 0;
-  const totalPoints = topParticipantsData?.data?.reduce((sum, p) => sum + p.totalPoints, 0) || 0;
+  const totalParticipants = topParticipantsData?.totalCount || 0;
+  const avgAchievement = topParticipantsData?.avgAchievement || 0;
+  const totalPoints = topParticipantsData?.totalPoints || 0;
   const topPerformer = topParticipantsData?.data?.[0];
 
   useEffect(() => {
@@ -121,6 +127,7 @@ export default function ResultsAnalysisPage({ currentIndex = 2, totalPages = 5, 
         totalPages={totalPages}
         onPrevious={onPrevious}
         onNext={onNext}
+        pageInfo={resultsAnalysisPageInfo}
       />
 
       <FiltersCard>
@@ -253,13 +260,16 @@ export default function ResultsAnalysisPage({ currentIndex = 2, totalPages = 5, 
             value: topPerformer?.participantName || '-',
             icon: <EmojiEventsIcon sx={{ fontSize: 18 }} />,
             color: '#FF9800',
-            changeLabel: topPerformer ? `${topPerformer.avgAchievementRate.toFixed(1)}% logro` : undefined,
+            changeLabel: topPerformer ? `${topPerformer.achievementRate.toFixed(1)}% logro` : undefined,
           },
         ]}
       />
 
       <Typography variant="caption" sx={{ display: 'block', mb: 2, color: 'text.secondary', fontStyle: 'italic' }}>
         * El filtro de Cargo es obligatorio. Los supervisores suman los resultados de sus vendedores.
+        {topParticipantsData?.latestPeriod && (
+          <> — Datos completos hasta: <strong>{topParticipantsData.latestPeriod}</strong></>
+        )}
       </Typography>
 
       <Grid container spacing={{ xs: 1.5, sm: 2, md: 3 }}>

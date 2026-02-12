@@ -12,12 +12,20 @@ interface ProductSales {
   transactionCount: number;
 }
 
+interface DateRange {
+  fromMonth: number;
+  fromYear: number;
+  toMonth: number;
+  toYear: number;
+}
+
 interface TopProductsCardProps {
   distributor?: string;
   month?: string;
   year?: string;
   category?: string;
   limit?: number;
+  dateRange?: DateRange;
 }
 
 export default function TopProductsCard({
@@ -25,10 +33,25 @@ export default function TopProductsCard({
   month = 'all',
   year = 'all',
   category = 'all',
-  limit = 15
+  limit = 15,
+  dateRange,
 }: TopProductsCardProps) {
+  const queryParams = new URLSearchParams({
+    distributor,
+    month,
+    year,
+    category,
+    limit: limit.toString(),
+  });
+  if (dateRange) {
+    queryParams.append('fromMonth', dateRange.fromMonth.toString());
+    queryParams.append('fromYear', dateRange.fromYear.toString());
+    queryParams.append('toMonth', dateRange.toMonth.toString());
+    queryParams.append('toYear', dateRange.toYear.toString());
+  }
+
   const { data, error, isLoading} = useSWR<{ success: boolean; data?: ProductSales[] }>(
-    `/api/transactions-top-products?distributor=${distributor}&month=${month}&year=${year}&category=${category}&limit=${limit}`,
+    `/api/transactions-top-products?${queryParams.toString()}`,
     fetcher
   );
 

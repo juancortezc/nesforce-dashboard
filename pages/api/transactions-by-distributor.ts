@@ -27,9 +27,24 @@ export default async function handler(
   }
 
   try {
-    const { month, year } = req.query;
+    const { month, year, fromMonth, fromYear, toMonth, toYear } = req.query;
 
     let whereClause = 'WHERE cod_distribuidor IS NOT NULL';
+    const params: any = {};
+
+    // Filtro por rango de fechas del Header
+    if (fromMonth && fromYear && toMonth && toYear) {
+      const startDate = `${fromYear}-${String(fromMonth).padStart(2, '0')}-01`;
+      const endYear = parseInt(toYear as string);
+      const endMonth = parseInt(toMonth as string);
+      const lastDay = new Date(endYear, endMonth, 0).getDate();
+      const endDate = `${toYear}-${String(toMonth).padStart(2, '0')}-${lastDay}`;
+
+      whereClause += ` AND SAFE.PARSE_DATE('%d/%m/%Y', fecha) >= @startDate`;
+      whereClause += ` AND SAFE.PARSE_DATE('%d/%m/%Y', fecha) <= @endDate`;
+      params.startDate = startDate;
+      params.endDate = endDate;
+    }
 
     if (month && month !== 'all') {
       whereClause += ` AND EXTRACT(MONTH FROM SAFE.PARSE_DATE('%d/%m/%Y', fecha)) = @month`;
@@ -53,7 +68,6 @@ export default async function handler(
       LIMIT 20
     `;
 
-    const params: any = {};
     if (month && month !== 'all') params.month = parseInt(month as string);
     if (year && year !== 'all') params.year = parseInt(year as string);
 

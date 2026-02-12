@@ -29,6 +29,7 @@ import { PageHeader } from './PageHeader';
 import { FiltersCard } from './FiltersCard';
 import { KPICards } from './KPICards';
 import { DateRange } from './Header';
+import { pointsPageInfo } from '@/config/pageInfoConfigs';
 
 const fetcher = (url: string) => fetch(url).then((r) => r.json());
 
@@ -180,6 +181,7 @@ export default function PointsPage({ currentIndex = 0, totalPages = 5, onPreviou
           totalPages={totalPages}
           onPrevious={onPrevious}
           onNext={onNext}
+          pageInfo={pointsPageInfo}
         />
         <Card elevation={0} sx={{ border: '1px solid', borderColor: 'divider', p: 4, textAlign: 'center' }}>
           <CircularProgress />
@@ -197,6 +199,7 @@ export default function PointsPage({ currentIndex = 0, totalPages = 5, onPreviou
           totalPages={totalPages}
           onPrevious={onPrevious}
           onNext={onNext}
+          pageInfo={pointsPageInfo}
         />
         <Card elevation={0} sx={{ border: '1px solid', borderColor: 'divider', p: 4 }}>
           <Typography color="error">Error cargando datos</Typography>

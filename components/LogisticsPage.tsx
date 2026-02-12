@@ -49,6 +49,7 @@ import { PageHeader } from './PageHeader';
 import { FiltersCard } from './FiltersCard';
 import { KPICards } from './KPICards';
 import { DateRange } from './Header';
+import { logisticsPageInfo } from '@/config/pageInfoConfigs';
 
 const fetcher = (url: string) => fetch(url).then((r) => r.json());
 
@@ -264,6 +265,7 @@ export default function LogisticsPage({ currentIndex = 5, totalPages = 6, onPrev
         totalPages={totalPages}
         onPrevious={onPrevious}
         onNext={onNext}
+        pageInfo={logisticsPageInfo}
       />
 
       <FiltersCard>
